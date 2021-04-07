@@ -23,6 +23,10 @@ namespace Studentify.Controllers
             _logger = logger;
         }
 
+        public WeatherForecastController()
+        {
+        }
+
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
