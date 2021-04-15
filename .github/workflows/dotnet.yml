@@ -7,10 +7,10 @@ on:
   pull_request:
     branches:
     - develop
+    - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +25,34 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Build release
+      run: dotnet build --configuration Release
+    - name: Dotnet publish
+      run: dotnet publish -c Release -o Studentify
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Update database
+      run: |
+        dotnet tool install --global dotnet-ef
+        dotnet tool restore
+        dotnet ef database update --project Studentify --connection "${{ secrets.DEFAULT_CONNECTION_STRING }}"
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+    - name: 'Azure deploy'
+      uses: azure/webapps-deploy@v1
+      with:
+        app-name: studentify20210330221435
+        publish-profile: ${{ secrets.PUBLISH_PROFILE }}
+        package: './Studentify'
