@@ -8,6 +8,7 @@ namespace Studentify.Data
     public class StudentifyDbContext: IdentityDbContext<StudentifyUser>
     {
         public DbSet<Initial> Initial { get; set; }
+        public DbSet<StudentifyAccount> StudentifyAccounts { get; set; }
 
         public StudentifyDbContext(DbContextOptions<StudentifyDbContext> options) : base(options)
         {
