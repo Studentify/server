@@ -28,5 +28,8 @@ namespace Studentify.Models
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        
+        public int EventId { get; set; }
+        public Event Event { get; set; }
     }
 }

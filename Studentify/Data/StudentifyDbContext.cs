@@ -9,6 +9,7 @@ namespace Studentify.Data
     {
         public DbSet<Initial> Initial { get; set; }
         public DbSet<StudentifyAccount> StudentifyAccounts { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         public StudentifyDbContext(DbContextOptions<StudentifyDbContext> options) : base(options)
         {
