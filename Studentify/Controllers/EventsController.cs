@@ -78,6 +78,7 @@ namespace Studentify.Controllers
         [HttpPost]
         public async Task<ActionResult<Event>> PostEvent(Event @event)
         {
+            @event.Author = await _context.StudentifyAccounts.FindAsync(@event.StudentifyAccountId);
             _context.Events.Add(@event);
             await _context.SaveChangesAsync();
 

@@ -236,19 +236,24 @@ namespace Studentify.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EventType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StudentifyAccountId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentifyAccountId")
+                        .IsUnique();
 
                     b.ToTable("Events");
                 });
@@ -279,9 +284,6 @@ namespace Studentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -295,9 +297,6 @@ namespace Studentify.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventId")
-                        .IsUnique();
 
                     b.ToTable("StudentifyAccounts");
                 });
@@ -353,20 +352,20 @@ namespace Studentify.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
+            modelBuilder.Entity("Studentify.Models.Event", b =>
                 {
-                    b.HasOne("Studentify.Models.Event", "Event")
-                        .WithOne("Author")
-                        .HasForeignKey("Studentify.Models.StudentifyAccount", "EventId")
+                    b.HasOne("Studentify.Models.StudentifyAccount", "Author")
+                        .WithOne("Event")
+                        .HasForeignKey("Studentify.Models.Event", "StudentifyAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
+                    b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("Studentify.Models.Event", b =>
+            modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
-                    b.Navigation("Author");
+                    b.Navigation("Event");
                 });
 #pragma warning restore 612, 618
         }

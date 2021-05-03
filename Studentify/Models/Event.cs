@@ -1,17 +1,20 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Studentify.Models
 {
     public class Event
     {
         [Key] public int Id { get; set; }
-        public int EventType { get; set; }
-        public string Name { get; set; }
-        public DateTime CreationDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public StudentifyAccount Author { get; set; }
-        public string Location { get; set; }
+        public string EventType => GetType().ToString();
+        [Required] public string Name { get; set; }
+        [Required] public DateTime CreationDate { get; set; }
+        [Required] public DateTime ExpiryDate { get; set; }
+        [Required] public string Location { get; set; }
         public string Description { get; set; }
+
+        [JsonIgnore, Required] public StudentifyAccount Author { get; set; }
+        public int StudentifyAccountId { get; set; }
     }
 }
