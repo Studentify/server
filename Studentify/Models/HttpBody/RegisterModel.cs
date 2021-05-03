@@ -16,7 +16,7 @@ namespace Studentify.Models.HttpBody
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Last Name is required")]
-        public string Lastname { get; set; }
+        public string LastName { get; set; }
 
         [EmailAddress]
         [Required(ErrorMessage = "Email is required")]

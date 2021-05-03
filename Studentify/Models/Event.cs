@@ -7,7 +7,7 @@ namespace Studentify.Models
     public class Event
     {
         [Key] public int Id { get; set; }
-        public string EventType => GetType().ToString();
+        public string EventType => GetType().Name.ToUpper();
         [Required] public string Name { get; set; }
         [Required] public DateTime CreationDate { get; set; }
         [Required] public DateTime ExpiryDate { get; set; }
@@ -15,6 +15,6 @@ namespace Studentify.Models
         public string Description { get; set; }
 
         [JsonIgnore, Required] public StudentifyAccount Author { get; set; }
-        public int StudentifyAccountId { get; set; }
+        [Required] public int StudentifyAccountId { get; set; }
     }
 }

@@ -117,7 +117,7 @@ namespace Studentify.Controllers
             {
                 Email = model.Email,
                 FirstName = model.FirstName,
-                LastName = model.Lastname,
+                LastName = model.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };

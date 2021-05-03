@@ -252,8 +252,7 @@ namespace Studentify.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentifyAccountId")
-                        .IsUnique();
+                    b.HasIndex("StudentifyAccountId");
 
                     b.ToTable("Events");
                 });
@@ -355,8 +354,8 @@ namespace Studentify.Migrations
             modelBuilder.Entity("Studentify.Models.Event", b =>
                 {
                     b.HasOne("Studentify.Models.StudentifyAccount", "Author")
-                        .WithOne("Event")
-                        .HasForeignKey("Studentify.Models.Event", "StudentifyAccountId")
+                        .WithMany("Events")
+                        .HasForeignKey("StudentifyAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -365,7 +364,7 @@ namespace Studentify.Migrations
 
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
-                    b.Navigation("Event");
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }
