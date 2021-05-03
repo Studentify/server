@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Data;
 using Studentify.Models;
+using Studentify.Models.HttpBody;
 
 namespace Studentify.Controllers
 {
@@ -76,9 +77,19 @@ namespace Studentify.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
+        public async Task<ActionResult<Event>> PostEvent(EventDTO eventDto)
         {
+            var @event = new Event()
+            {
+                Name = eventDto.Name,
+                ExpiryDate = eventDto.ExpiryDate,
+                Location = eventDto.Location,
+                Description = eventDto.Description,
+                StudentifyAccountId = eventDto.StudentifyAccountId
+            };
             @event.Author = await _context.StudentifyAccounts.FindAsync(@event.StudentifyAccountId);
+            @event.CreationDate = DateTime.Now;
+            
             _context.Events.Add(@event);
             await _context.SaveChangesAsync();
 
