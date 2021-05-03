@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Studentify.Models.StudentifyEvents
 {
-    public class StudentifyEvent
+    public abstract class StudentifyEvent
     {
         [Key] public int Id { get; set; }
         public string EventType => GetType().Name.ToUpper();

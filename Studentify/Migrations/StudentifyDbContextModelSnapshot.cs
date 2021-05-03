@@ -279,6 +279,10 @@ namespace Studentify.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
@@ -298,6 +302,18 @@ namespace Studentify.Migrations
                     b.HasIndex("StudentifyAccountId");
 
                     b.ToTable("Events");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("StudentifyEvent");
+                });
+
+            modelBuilder.Entity("Studentify.Models.StudentifyEvents.Info", b =>
+                {
+                    b.HasBaseType("Studentify.Models.StudentifyEvents.StudentifyEvent");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue("Info");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
