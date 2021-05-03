@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Models.Authentication;
+using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Models
 {
@@ -29,6 +30,6 @@ namespace Studentify.Models
         [EmailAddress]
         public string Email { get; set; }
         
-        public List<Event> Events { get; set; }
+        public List<StudentifyEvent> Events { get; set; }
     }
 }

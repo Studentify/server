@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Studentify.Models
+namespace Studentify.Models.StudentifyEvents
 {
-    public class Event
+    public class StudentifyEvent
     {
         [Key] public int Id { get; set; }
         public string EventType => GetType().Name.ToUpper();

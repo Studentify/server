@@ -223,40 +223,6 @@ namespace Studentify.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Studentify.Models.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExpiryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StudentifyAccountId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentifyAccountId");
-
-                    b.ToTable("Events");
-                });
-
             modelBuilder.Entity("Studentify.Models.Initial", b =>
                 {
                     b.Property<int>("Id")
@@ -298,6 +264,40 @@ namespace Studentify.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StudentifyAccounts");
+                });
+
+            modelBuilder.Entity("Studentify.Models.StudentifyEvents.StudentifyEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentifyAccountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentifyAccountId");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -351,7 +351,7 @@ namespace Studentify.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Studentify.Models.Event", b =>
+            modelBuilder.Entity("Studentify.Models.StudentifyEvents.StudentifyEvent", b =>
                 {
                     b.HasOne("Studentify.Models.StudentifyAccount", "Author")
                         .WithMany("Events")

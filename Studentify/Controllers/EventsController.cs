@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Studentify.Data;
 using Studentify.Models;
 using Studentify.Models.HttpBody;
+using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Controllers
 {
@@ -24,36 +25,36 @@ namespace Studentify.Controllers
 
         // GET: api/Events
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<StudentifyEvent>>> GetEvents()
         {
             return await _context.Events.ToListAsync();
         }
 
         // GET: api/Events/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<StudentifyEvent>> GetEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var studentifyEvent = await _context.Events.FindAsync(id);
 
-            if (@event == null)
+            if (studentifyEvent == null)
             {
                 return NotFound();
             }
 
-            return @event;
+            return studentifyEvent;
         }
 
         // PUT: api/Events/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, Event @event)
+        public async Task<IActionResult> PutEvent(int id, StudentifyEvent studentifyEvent)
         {
-            if (id != @event.Id)
+            if (id != studentifyEvent.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(@event).State = EntityState.Modified;
+            _context.Entry(studentifyEvent).State = EntityState.Modified;
 
             try
             {
@@ -77,9 +78,9 @@ namespace Studentify.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(EventDTO eventDto)
+        public async Task<ActionResult<StudentifyEvent>> PostEvent(EventDTO eventDto)
         {
-            var @event = new Event()
+            var studentifyEvent = new StudentifyEvent()
             {
                 Name = eventDto.Name,
                 ExpiryDate = eventDto.ExpiryDate,
@@ -87,26 +88,26 @@ namespace Studentify.Controllers
                 Description = eventDto.Description,
                 StudentifyAccountId = eventDto.StudentifyAccountId
             };
-            @event.Author = await _context.StudentifyAccounts.FindAsync(@event.StudentifyAccountId);
-            @event.CreationDate = DateTime.Now;
+            studentifyEvent.Author = await _context.StudentifyAccounts.FindAsync(studentifyEvent.StudentifyAccountId);
+            studentifyEvent.CreationDate = DateTime.Now;
             
-            _context.Events.Add(@event);
+            _context.Events.Add(studentifyEvent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+            return CreatedAtAction("GetEvent", new { id = studentifyEvent.Id }, studentifyEvent);
         }
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
+            var studentifyEvent = await _context.Events.FindAsync(id);
+            if (studentifyEvent == null)
             {
                 return NotFound();
             }
 
-            _context.Events.Remove(@event);
+            _context.Events.Remove(studentifyEvent);
             await _context.SaveChangesAsync();
 
             return NoContent();

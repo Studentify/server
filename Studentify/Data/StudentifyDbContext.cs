@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Studentify.Models;
 using Studentify.Models.Authentication;
+using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data
 {
@@ -9,7 +10,7 @@ namespace Studentify.Data
     {
         public DbSet<Initial> Initial { get; set; }
         public DbSet<StudentifyAccount> StudentifyAccounts { get; set; }
-        public DbSet<Event> Events { get; set; }
+        public DbSet<StudentifyEvent> Events { get; set; }
 
         public StudentifyDbContext(DbContextOptions<StudentifyDbContext> options) : base(options)
         {
