@@ -49,9 +49,7 @@ namespace Studentify.Controllers
         public async Task<IActionResult> PutInfo(int id, Info info)
         {
             if (id != info.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(info).State = EntityState.Modified;
 
@@ -62,13 +60,8 @@ namespace Studentify.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!InfoExists(id))
-                {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -79,6 +72,7 @@ namespace Studentify.Controllers
         [HttpPost]
         public async Task<ActionResult<Info>> PostInfo(InfoDTO infoDto)
         {
+            
             var info = new Info()
             {
                 Name = infoDto.Name,
@@ -88,7 +82,7 @@ namespace Studentify.Controllers
                 StudentifyAccountId = infoDto.StudentifyAccountId,
                 Category = infoDto.Category,
             };
-            info.Author = await _context.StudentifyAccounts.FindAsync(info.StudentifyAccountId);
+            
             info.CreationDate = DateTime.Now;
             
             _context.Infos.Add(info);
@@ -97,21 +91,7 @@ namespace Studentify.Controllers
             return CreatedAtAction(nameof(GetInfo), new { id = info.Id }, info);
         }
 
-        // // DELETE: api/Infos/5
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteInfo(int id)
-        // {
-        //     var info = await _context.Infos.FindAsync(id);
-        //     if (info == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     _context.Infos.Remove(info);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return NoContent();
-        // }
+
 
         private bool InfoExists(int id)
         {

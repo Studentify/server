@@ -14,7 +14,7 @@ namespace Studentify.Models.StudentifyEvents
         [Required] public string Location { get; set; }
         public string Description { get; set; }
 
-        [JsonIgnore, Required] public StudentifyAccount Author { get; set; }
+        [JsonIgnore] public StudentifyAccount Author { get; set; }
         [Required] public int StudentifyAccountId { get; set; }
     }
 }

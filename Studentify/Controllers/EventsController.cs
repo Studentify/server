@@ -44,59 +44,6 @@ namespace Studentify.Controllers
             return studentifyEvent;
         }
 
-        // // PUT: api/Events/5
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutEvent(int id, StudentifyEvent studentifyEvent)
-        // {
-        //     if (id != studentifyEvent.Id)
-        //     {
-        //         return BadRequest();
-        //     }
-        //
-        //     _context.Entry(studentifyEvent).State = EntityState.Modified;
-        //
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!EventExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
-        //
-        //     return NoContent();
-        // }
-
-        // // POST: api/Events
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPost]
-        // public async Task<ActionResult<StudentifyEvent>> PostEvent(EventDTO eventDto)
-        // {
-        //     var studentifyEvent = new StudentifyEvent()
-        //     {
-        //         Name = eventDto.Name,
-        //         ExpiryDate = eventDto.ExpiryDate,
-        //         Location = eventDto.Location,
-        //         Description = eventDto.Description,
-        //         StudentifyAccountId = eventDto.StudentifyAccountId
-        //     };
-        //     studentifyEvent.Author = await _context.StudentifyAccounts.FindAsync(studentifyEvent.StudentifyAccountId);
-        //     studentifyEvent.CreationDate = DateTime.Now;
-        //     
-        //     _context.Events.Add(studentifyEvent);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return CreatedAtAction("GetEvent", new { id = studentifyEvent.Id }, studentifyEvent);
-        // }
-
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
@@ -111,11 +58,6 @@ namespace Studentify.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool EventExists(int id)
-        {
-            return _context.Events.Any(e => e.Id == id);
         }
     }
 }

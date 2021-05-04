@@ -35,7 +35,9 @@ namespace Studentify
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<StudentifyDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
+                options
+                    // .UseLazyLoadingProxies()
+                    .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
 
             services.AddControllers();
 
@@ -118,6 +120,7 @@ namespace Studentify
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
