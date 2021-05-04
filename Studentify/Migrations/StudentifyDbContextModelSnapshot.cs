@@ -223,21 +223,6 @@ namespace Studentify.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Studentify.Models.Initial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Initial");
-                });
-
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
                     b.Property<int>("Id")
