@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Models.Authentication;
@@ -30,6 +31,6 @@ namespace Studentify.Models
         [EmailAddress]
         public string Email { get; set; }
         
-        public List<StudentifyEvent> Events { get; set; }
+        [JsonIgnore] public List<StudentifyEvent> Events { get; set; }
     }
 }
