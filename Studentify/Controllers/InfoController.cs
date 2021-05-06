@@ -71,14 +71,24 @@ namespace Studentify.Controllers
         [HttpPost]
         public async Task<ActionResult<Info>> PostInfo(InfoDTO infoDto)
         {
-            
+            var username = User.Identity.Name;
+            //var studentifyAccounts = await _context.StudentifyAccounts.ToListAsync();
+            //foreach (var studentifyAccount in studentifyAccounts)
+            //{
+            //    await _context.Entry(studentifyAccount).Reference(s => s.User).LoadAsync();
+            //}
+
+            //var accountId = studentifyAccounts.Where(a => a.User.UserName == username).FirstOrDefault().Id;
+            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
+            var account = accountManager.FindAccountByUsername(username);
+
             var info = new Info()
             {
                 Name = infoDto.Name,
                 ExpiryDate = infoDto.ExpiryDate,
                 Location = infoDto.Location,
                 Description = infoDto.Description,
-                StudentifyAccountId = infoDto.StudentifyAccountId,  //todo change to retrieve this from token
+                StudentifyAccountId = account.Id,
                 Category = infoDto.Category,
             };
             

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +23,9 @@ namespace Studentify.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentifyAccount>>> GetStudentifyAccounts()
         {
-            var studentifyAccounts = await _context.StudentifyAccounts.ToListAsync();
-            // foreach (var studentifyAccount in studentifyAccounts)
-            // {
-            //     await _context.Entry(studentifyAccount).Collection(s => s.Events).LoadAsync();
-            // }
-
-            return studentifyAccounts;
+            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
+            var accounts = await accountManager.GetAccountsAsync();
+            return accounts.ToList();
         }
         
         // GET: api/Initials/5
