@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using NetTopologySuite.Geometries;
 
 namespace Studentify.Models.StudentifyEvents
 {
@@ -11,7 +12,7 @@ namespace Studentify.Models.StudentifyEvents
         [Required] public string Name { get; set; }
         [Required] public DateTime CreationDate { get; set; }
         [Required] public DateTime ExpiryDate { get; set; }
-        [Required] public string Location { get; set; }     //todo change to spatial data type https://docs.microsoft.com/en-us/ef/core/modeling/spatial
+        [Required] public Point Location { get; set; }
         public string Description { get; set; }
 
         [JsonIgnore] public StudentifyAccount Author { get; set; }
