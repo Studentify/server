@@ -29,7 +29,7 @@ namespace Studentify
             services.AddDbContext<StudentifyDbContext>(options => 
                 options
                     // .UseLazyLoadingProxies()
-                    .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
+                    .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), x => x.UseNetTopologySuite()));
 
             services.AddControllers();
 

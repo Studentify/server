@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Data;
@@ -9,6 +11,7 @@ namespace Studentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EventsController : ControllerBase
     {
         private readonly StudentifyDbContext _context;
@@ -22,6 +25,7 @@ namespace Studentify.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentifyEvent>>> GetEvents()
         {
+            Console.WriteLine(User.Identity.IsAuthenticated);
             return await _context.Events.ToListAsync();
         }
 

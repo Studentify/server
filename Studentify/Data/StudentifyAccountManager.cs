@@ -28,10 +28,10 @@ namespace Studentify.Data
             return studentifyAccounts.ToList();
         }
 
-        public async Task<IEnumerable<StudentifyAccount>> FindAccountByUsername(string username)
+        public async Task<StudentifyAccount> FindAccountByUsername(string username)
         {
             var studentifyAccounts = await GetAccountsAsync();
-            return studentifyAccounts.Where(a => a.User.UserName == username);
+            return studentifyAccounts.Where(a => a.User.UserName == username).ToList()[0];
         }
     }
 }

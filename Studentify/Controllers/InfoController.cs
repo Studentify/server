@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using Studentify.Data;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
@@ -72,21 +73,15 @@ namespace Studentify.Controllers
         public async Task<ActionResult<Info>> PostInfo(InfoDTO infoDto)
         {
             var username = User.Identity.Name;
-            //var studentifyAccounts = await _context.StudentifyAccounts.ToListAsync();
-            //foreach (var studentifyAccount in studentifyAccounts)
-            //{
-            //    await _context.Entry(studentifyAccount).Reference(s => s.User).LoadAsync();
-            //}
-
-            //var accountId = studentifyAccounts.Where(a => a.User.UserName == username).FirstOrDefault().Id;
             StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var account = accountManager.FindAccountByUsername(username);
+            var account = await accountManager.FindAccountByUsername(username);
 
             var info = new Info()
             {
                 Name = infoDto.Name,
                 ExpiryDate = infoDto.ExpiryDate,
-                Location = infoDto.Location,
+                // Location = new Point(infoDto.Longitude, infoDto.Latitude),
+                Location = "test",  //todo change to new Point(infoDto.Longitude, infoDto.Latitude) when it works
                 Description = infoDto.Description,
                 StudentifyAccountId = account.Id,
                 Category = infoDto.Category,
