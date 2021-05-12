@@ -11,8 +11,8 @@ using Studentify.Data;
 namespace Studentify.Migrations
 {
     [DbContext(typeof(StudentifyDbContext))]
-    [Migration("20210512181221_Location")]
-    partial class Location
+    [Migration("20210512190104_TradeOffer")]
+    partial class TradeOffer
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -292,6 +292,19 @@ namespace Studentify.Migrations
                         .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("Info");
+                });
+
+            modelBuilder.Entity("Studentify.Models.StudentifyEvents.TradeOffer", b =>
+                {
+                    b.HasBaseType("Studentify.Models.StudentifyEvents.StudentifyEvent");
+
+                    b.Property<string>("Offer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Price")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("TradeOffer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -292,6 +292,19 @@ namespace Studentify.Migrations
                     b.HasDiscriminator().HasValue("Info");
                 });
 
+            modelBuilder.Entity("Studentify.Models.StudentifyEvents.TradeOffer", b =>
+                {
+                    b.HasBaseType("Studentify.Models.StudentifyEvents.StudentifyEvent");
+
+                    b.Property<string>("Offer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Price")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("TradeOffer");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)

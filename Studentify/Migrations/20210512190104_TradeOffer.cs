@@ -4,7 +4,7 @@ using NetTopologySuite.Geometries;
 
 namespace Studentify.Migrations
 {
-    public partial class Location : Migration
+    public partial class TradeOffer : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -187,7 +187,9 @@ namespace Studentify.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentifyAccountId = table.Column<int>(type: "int", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: true)
+                    Category = table.Column<int>(type: "int", nullable: true),
+                    Price = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Offer = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
