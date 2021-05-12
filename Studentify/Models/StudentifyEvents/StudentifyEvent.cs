@@ -12,7 +12,7 @@ namespace Studentify.Models.StudentifyEvents
         [Required] public string Name { get; set; }
         [Required] public DateTime CreationDate { get; set; }
         [Required] public DateTime ExpiryDate { get; set; }
-        [Required] public string Location { get; set; }
+        [Required] public Point Location { get; set; }
         public string Description { get; set; }
 
         [JsonIgnore] public StudentifyAccount Author { get; set; }

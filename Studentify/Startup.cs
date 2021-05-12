@@ -26,6 +26,11 @@ namespace Studentify
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers()
+                .AddJsonOptions(options => {
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                });
+            
             services.AddDbContext<StudentifyDbContext>(options => 
                 options
                     // .UseLazyLoadingProxies()
