@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Studentify.Data;
 
 namespace Studentify.Migrations
 {
     [DbContext(typeof(StudentifyDbContext))]
-    partial class StudentifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210504223524_RemoveInitial")]
+    partial class RemoveInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,13 +232,23 @@ namespace Studentify.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("StudentifyUserId")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentifyUsername")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StudentifyUserId");
 
                     b.ToTable("StudentifyAccounts");
                 });
@@ -340,17 +352,6 @@ namespace Studentify.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
-                {
-                    b.HasOne("Studentify.Models.Authentication.StudentifyUser", "User")
-                        .WithMany()
-                        .HasForeignKey("StudentifyUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Studentify.Models.StudentifyEvents.StudentifyEvent", b =>

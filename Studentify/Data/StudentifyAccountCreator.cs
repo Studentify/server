@@ -62,10 +62,7 @@ namespace Studentify.Data
         {
             return new StudentifyAccount()
             {
-                StudentifyUsername = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email
+                StudentifyUserId = user.Id
             };
         }
     }

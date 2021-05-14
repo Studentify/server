@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Studentify.Data;
 
 namespace Studentify.Migrations
 {
     [DbContext(typeof(StudentifyDbContext))]
-    partial class StudentifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210503223022_CreateInfoModel")]
+    partial class CreateInfoModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,6 +225,21 @@ namespace Studentify.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("Studentify.Models.Initial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Initial");
+                });
+
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -230,13 +247,23 @@ namespace Studentify.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("StudentifyUserId")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentifyUsername")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StudentifyUserId");
 
                     b.ToTable("StudentifyAccounts");
                 });
@@ -340,17 +367,6 @@ namespace Studentify.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
-                {
-                    b.HasOne("Studentify.Models.Authentication.StudentifyUser", "User")
-                        .WithMany()
-                        .HasForeignKey("StudentifyUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Studentify.Models.StudentifyEvents.StudentifyEvent", b =>

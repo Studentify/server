@@ -39,7 +39,7 @@ namespace Studentify.Test
 
             var response = creator.CreateAccount(user);
             StudentifyAccount[] accounts = await context.StudentifyAccounts
-                                                        .Where(acc => acc.StudentifyUsername == "test-user")
+                                                        .Where(acc => acc.StudentifyUserId == user.Id)
                                                         .ToArrayAsync();
 
             Assert.AreEqual("Success", response.Status);

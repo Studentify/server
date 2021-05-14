@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Studentify.Models.Authentication
+﻿namespace Studentify.Models.Authentication
 {
     /// <summary>
     /// Class that represents response returned by AuthenticateController
