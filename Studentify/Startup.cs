@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Studentify.Models.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Studentify.Data.Repositories;
 
 namespace Studentify
 {
@@ -32,6 +33,8 @@ namespace Studentify
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), x => x.UseNetTopologySuite()));
 
             services.AddControllers();
+
+            services.AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>();
 
             services.AddIdentity<StudentifyUser, IdentityRole>()
                 .AddEntityFrameworkStores<StudentifyDbContext>()
