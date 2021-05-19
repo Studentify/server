@@ -31,8 +31,9 @@ namespace Studentify
                 options
                     // .UseLazyLoadingProxies()
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), x => x.UseNetTopologySuite()));
-
+            
             services.AddControllers();
+            //services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.));
 
             services.AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>();
 
@@ -40,7 +41,6 @@ namespace Studentify
                 .AddEntityFrameworkStores<StudentifyDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Authentication
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -48,7 +48,6 @@ namespace Studentify
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
 
-                // Jwt Bearer  
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;

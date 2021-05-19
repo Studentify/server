@@ -80,8 +80,7 @@ namespace Studentify.Controllers
             {
                 Name = infoDto.Name,
                 ExpiryDate = infoDto.ExpiryDate,
-                // Location = new Point(infoDto.Longitude, infoDto.Latitude),
-                Location = "test",  //todo change to new Point(infoDto.Longitude, infoDto.Latitude) when it works
+                Location = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
                 Description = infoDto.Description,
                 StudentifyAccountId = account.Id,
                 Category = infoDto.Category,
