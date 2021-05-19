@@ -19,6 +19,7 @@ namespace Studentify.Data.Repositories
             foreach (var elem in fillWithReferences)
             {
                 await Context.Entry(elem).Reference(i => i.Author).LoadAsync();
+                await Context.Entry(elem).Reference(i => i.Address).LoadAsync(); 
             }
 
             return fillWithReferences;

@@ -3,7 +3,7 @@ using NetTopologySuite.Geometries;
 
 namespace Studentify.Models.HttpBody
 {
-    public class EventDTO
+    public class EventDto
     {
         public string Name { get; set; }
         public DateTime ExpiryDate { get; set; }
