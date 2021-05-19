@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data.Repositories
 {
@@ -50,9 +51,14 @@ namespace Studentify.Data.Repositories
             return info;
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public virtual async Task<IEnumerable<T>> GetAll()
         {
-            return await Context.Set<T>().ToListAsync();
+            IEnumerable<T> temp = await Context.Set<T>().ToListAsync();
+
+            temp = await FillWithReferences(temp);
+            return temp;
         }
+
+        protected abstract Task<IEnumerable<T>> FillWithReferences(IEnumerable<T> elems);
     }
 }
