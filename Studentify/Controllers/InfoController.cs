@@ -91,7 +91,7 @@ namespace Studentify.Controllers
                     PostalCode = "test"
                 },
                 Description = infoDto.Description,
-                StudentifyAccountId = account.Id,
+                AuthorId = account.Id,
                 Category = infoDto.Category,
             };
             

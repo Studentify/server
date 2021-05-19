@@ -13,16 +13,10 @@ namespace Studentify.Data.Repositories
         }
 
 
-        protected override async Task<IEnumerable<StudentifyEvent>> FillWithReferences(IEnumerable<StudentifyEvent> elems)
+        protected override async Task FillWithReferences(StudentifyEvent entities)
         {
-            var fillWithReferences = elems.ToList();
-            foreach (var elem in fillWithReferences)
-            {
-                await Context.Entry(elem).Reference(i => i.Author).LoadAsync();
-                await Context.Entry(elem).Reference(i => i.Address).LoadAsync(); 
-            }
-
-            return fillWithReferences;
+            await Context.Entry(entities).Reference(i => i.Author).LoadAsync();
+            await Context.Entry(entities).Reference(i => i.Address).LoadAsync(); 
         }
     }
 }

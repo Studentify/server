@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Models.StudentifyEvents;
@@ -48,17 +49,21 @@ namespace Studentify.Data.Repositories
                 throw new DataException("Not found"); //todo change to better exception type
             }
 
+            await FillWithReferences(info);
+
             return info;
         }
 
         public virtual async Task<IEnumerable<T>> GetAll()
         {
-            IEnumerable<T> temp = await Context.Set<T>().ToListAsync();
-
-            temp = await FillWithReferences(temp);
-            return temp;
+            var entities = await Context.Set<T>().ToListAsync();
+            foreach (var entity in entities)
+            {
+                await FillWithReferences(entity);
+            }
+            return entities;
         }
 
-        protected abstract Task<IEnumerable<T>> FillWithReferences(IEnumerable<T> elems);
+        protected abstract Task FillWithReferences(T entities);
     }
 }

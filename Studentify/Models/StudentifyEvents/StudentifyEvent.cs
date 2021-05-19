@@ -29,6 +29,6 @@ namespace Studentify.Models.StudentifyEvents
         [JsonIgnore] public Address Address { get; set; }
 
         [JsonIgnore] public StudentifyAccount Author { get; set; }
-        [Required] public int StudentifyAccountId { get; set; }     //todo change name to AuthorId
+        [Required] public int AuthorId { get; set; }
     }
 }
