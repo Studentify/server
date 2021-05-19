@@ -15,9 +15,9 @@ using Studentify.Models.HttpBody;
 
 namespace Studentify.Controllers
 {
-	/// <summary>
-	/// Controller responsible for loging and registering user.
-	/// </summary>
+    /// <summary>
+    /// Controller responsible for loging and registering user.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AuthenticateController : ControllerBase
@@ -72,7 +72,7 @@ namespace Studentify.Controllers
                 var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],
                     audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddHours(3),
+                    expires: DateTime.Now.AddDays(3),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
@@ -80,7 +80,15 @@ namespace Studentify.Controllers
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    expiration = token.ValidTo,
+                    user = new
+                    {
+                        user.FirstName,
+                        user.LastName,
+                        user.UserName,
+                        user.Email,
+                        user.PhoneNumber
+                    }
                 });
             }
             return Unauthorized();
