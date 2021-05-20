@@ -8,13 +8,13 @@ using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data.Repositories
 {
-    public class SelectRepositoryBase<T> : RepositoryBase, ISelectRepositoryBase<T> where T : class
+    public class SelectRepositoryBase<T> : RepositoryBase, ISelectRepository<T> where T : class
     {
         public SelectRepositoryBase(StudentifyDbContext context) : base(context)
         {
         }
 
-        public async Task<T> FindById(int id)
+        public async Task<T> ById(int id)
         {
             var info = await Context.Set<T>().FindAsync(id);
 
@@ -29,7 +29,7 @@ namespace Studentify.Data.Repositories
             return info;
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> All()
         {
             var entities = await Context.Set<T>().ToListAsync();
             foreach (var entity in entities)

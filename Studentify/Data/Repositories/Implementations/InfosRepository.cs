@@ -5,18 +5,13 @@ namespace Studentify.Data.Repositories
 {
     public class InfosRepository : StudentifyEventsRepository, IInfosRepository
     {
-        private readonly IInsertRepositoryBase<Info> _insertRepositoryBase;
-
-        public InfosRepository(StudentifyDbContext context, ISelectRepositoryBase<StudentifyEvent> selectRepositoryBase,
-            IDeleteRepositoryBase<StudentifyEvent> deleteRepositoryBase, IInsertRepositoryBase<Info> insertRepositoryBase) : base(
-            context, selectRepositoryBase, deleteRepositoryBase)
+        public IInsertRepository<Info> Insert { get; }
+        
+        public InfosRepository(StudentifyDbContext context, ISelectRepository<StudentifyEvent> selectRepository,
+            IDeleteRepository<StudentifyEvent> deleteRepository, IInsertRepository<Info> insertRepository) : base(
+            context, selectRepository, deleteRepository)
         {
-            _insertRepositoryBase = insertRepositoryBase;
-        }
-
-        public Task InsertOne(Info entity)
-        {
-            return _insertRepositoryBase.InsertOne(entity);
+            Insert = insertRepository;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Studentify.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentifyEvent>>> GetEvents()
         {
-            var studentifyEvents = await _repository.GetAll();
+            var studentifyEvents = await _repository.Select.All();
             return studentifyEvents.ToList();
         }
 
@@ -37,7 +37,7 @@ namespace Studentify.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<StudentifyEvent>> GetEvent(int id)
         {
-            var studentifyEvent = await _repository.FindById(id);
+            var studentifyEvent = await _repository.Select.ById(id);
 
             if (studentifyEvent == null)
             {
@@ -53,7 +53,7 @@ namespace Studentify.Controllers
         {
             try
             {
-                await _repository.RemoveById(id);
+                await _repository.Delete.ById(id);
             }
             catch (DataException e)
             {

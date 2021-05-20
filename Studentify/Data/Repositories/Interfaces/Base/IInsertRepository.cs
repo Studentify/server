@@ -4,6 +4,6 @@ namespace Studentify.Data.Repositories
 {
     public interface IInsertRepository<T>
     {
-        Task InsertOne(T entity);
+        Task One(T entity);
     }
 }

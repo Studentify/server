@@ -9,7 +9,8 @@ namespace Studentify.Data.Repositories
 {
     public interface ISelectRepository<T>
     {
-        Task<T> FindById(int id);
-        Task<IEnumerable<T>> GetAll();
+        Task<T> ById(int id);
+        Task<IEnumerable<T>> All();
+        Func<T, Task> FillWithReferences { get; set; }
     }
 }

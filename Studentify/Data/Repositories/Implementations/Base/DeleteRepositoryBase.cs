@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace Studentify.Data.Repositories
 {
-    public class DeleteRepositoryBase<T> : RepositoryBase, IDeleteRepositoryBase<T> where T : class
+    public class DeleteRepositoryBase<T> : RepositoryBase, IDeleteRepository<T> where T : class
     {
         public DeleteRepositoryBase(StudentifyDbContext context) : base(context)
         {
         }
 
-        public async Task RemoveOne(T entity)
+        public async Task One(T entity)
         {
             if (entity == null)
             {
@@ -20,7 +20,7 @@ namespace Studentify.Data.Repositories
             await Context.SaveChangesAsync();
         }
 
-        public async Task RemoveById(int id)
+        public async Task ById(int id)
         {
             var studentifyEvent = await Context.Set<T>().FindAsync(id);
             if (studentifyEvent == null)

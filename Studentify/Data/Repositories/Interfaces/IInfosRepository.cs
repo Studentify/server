@@ -2,7 +2,8 @@
 
 namespace Studentify.Data.Repositories
 {
-    public interface IInfosRepository : IStudentifyEventsRepository, IInsertRepository<Info>
+    public interface IInfosRepository : IStudentifyEventsRepository
     {
+        public IInsertRepository<Info> Insert { get; }
     }
 }

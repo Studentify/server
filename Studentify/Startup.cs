@@ -37,9 +37,9 @@ namespace Studentify
             //services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.));
 
             services
-                .AddScoped(typeof(ISelectRepositoryBase<>), typeof(SelectRepositoryBase<>))
-                .AddScoped(typeof(IInsertRepositoryBase<>), typeof(InsertRepositoryBase<>))
-                .AddScoped(typeof(IDeleteRepositoryBase<>), typeof(DeleteRepositoryBase<>))
+                .AddScoped(typeof(ISelectRepository<>), typeof(SelectRepositoryBase<>))
+                .AddScoped(typeof(IInsertRepository<>), typeof(InsertRepositoryBase<>))
+                .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>();
 

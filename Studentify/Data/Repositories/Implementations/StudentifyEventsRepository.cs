@@ -7,40 +7,20 @@ namespace Studentify.Data.Repositories
 {
     public class StudentifyEventsRepository : RepositoryBase, IStudentifyEventsRepository
     {
-        private readonly ISelectRepositoryBase<StudentifyEvent> _selectRepositoryBase;
-        private readonly IDeleteRepositoryBase<StudentifyEvent> _deleteRepositoryBase;
+        public ISelectRepository<StudentifyEvent> Select { get; }
+        public IDeleteRepository<StudentifyEvent> Delete { get; }
 
         public StudentifyEventsRepository(StudentifyDbContext context,
-            ISelectRepositoryBase<StudentifyEvent> selectRepositoryBase,
-            IDeleteRepositoryBase<StudentifyEvent> deleteRepositoryBase) : base(context)
+            ISelectRepository<StudentifyEvent> selectRepository,
+            IDeleteRepository<StudentifyEvent> deleteRepository) : base(context)
         {
-            _selectRepositoryBase = selectRepositoryBase;
-            _deleteRepositoryBase = deleteRepositoryBase;
-            _selectRepositoryBase.FillWithReferences += async entities =>
+            Select = selectRepository;
+            Delete = deleteRepository;
+            Select.FillWithReferences += async entities =>
             {
                 await Context.Entry(entities).Reference(i => i.Author).LoadAsync();
                 await Context.Entry(entities).Reference(i => i.Address).LoadAsync();
             };
-        }
-
-        public async Task<StudentifyEvent> FindById(int id)
-        {
-            return await _selectRepositoryBase.FindById(id);
-        }
-
-        public async Task<IEnumerable<StudentifyEvent>> GetAll()
-        {
-            return await _selectRepositoryBase.GetAll();
-        }
-
-        public async Task RemoveOne(StudentifyEvent entity)
-        {
-            await _deleteRepositoryBase.RemoveOne(entity);
-        }
-
-        public async Task RemoveById(int id)
-        {
-            await _deleteRepositoryBase.RemoveById(id);
         }
     }
 }
