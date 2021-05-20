@@ -11,6 +11,5 @@ namespace Studentify.Data.Repositories
     {
         Task<T> FindById(int id);
         Task<IEnumerable<T>> GetAll();
-        Func<T, Task> FillWithReferences { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Studentify.Data.Repositories
 {
-    public class InsertRepositoryBase<T> : RepositoryBase, IInsertRepository<T> where T : class
+    public class InsertRepositoryBase<T> : RepositoryBase, IInsertRepositoryBase<T> where T : class
     {
         public InsertRepositoryBase(StudentifyDbContext context) : base(context)
         {

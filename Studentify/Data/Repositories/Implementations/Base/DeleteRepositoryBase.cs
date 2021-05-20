@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Studentify.Data.Repositories
 {
-    public class DeleteRepositoryBase<T> : RepositoryBase, IDeleteRepository<T> where T : class
+    public class DeleteRepositoryBase<T> : RepositoryBase, IDeleteRepositoryBase<T> where T : class
     {
         public DeleteRepositoryBase(StudentifyDbContext context) : base(context)
         {

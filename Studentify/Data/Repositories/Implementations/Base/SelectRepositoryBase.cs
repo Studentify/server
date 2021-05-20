@@ -8,7 +8,7 @@ using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data.Repositories
 {
-    public class SelectRepositoryBase<T> : RepositoryBase, ISelectRepository<T> where T : class
+    public class SelectRepositoryBase<T> : RepositoryBase, ISelectRepositoryBase<T> where T : class
     {
         public SelectRepositoryBase(StudentifyDbContext context) : base(context)
         {
