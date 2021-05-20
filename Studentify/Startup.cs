@@ -12,7 +12,6 @@ using Studentify.Models.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Studentify.Data.Repositories;
-using Studentify.Models.StudentifyEvents;
 
 namespace Studentify
 {

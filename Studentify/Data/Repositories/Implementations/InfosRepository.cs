@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Studentify.Models.StudentifyEvents;
+﻿using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data.Repositories
 {

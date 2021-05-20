@@ -1,5 +1,4 @@
 ﻿using System;
-using NetTopologySuite.Geometries;
 
 namespace Studentify.Models.HttpBody
 {
