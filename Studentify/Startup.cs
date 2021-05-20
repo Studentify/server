@@ -12,6 +12,7 @@ using Studentify.Models.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Studentify.Data.Repositories;
+using Studentify.Models.StudentifyEvents;
 
 namespace Studentify
 {
@@ -35,7 +36,12 @@ namespace Studentify
             services.AddControllers();
             //services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.));
 
-            services.AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>();
+            services
+                .AddScoped(typeof(ISelectRepository<>), typeof(SelectRepositoryBase<>))
+                .AddScoped(typeof(IInsertRepository<>), typeof(InsertRepositoryBase<>))
+                .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
+                .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
+                .AddScoped<IInfosRepository, InfosRepository>();
 
             services.AddIdentity<StudentifyUser, IdentityRole>()
                 .AddEntityFrameworkStores<StudentifyDbContext>()

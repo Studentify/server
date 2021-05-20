@@ -2,7 +2,7 @@
 
 namespace Studentify.Data.Repositories
 {
-    public interface IStudentifyEventsRepository : IRepositoryBase<StudentifyEvent>
+    public interface IStudentifyEventsRepository : ISelectRepository<StudentifyEvent>, IDeleteRepository<StudentifyEvent>
     {
     }
 }
