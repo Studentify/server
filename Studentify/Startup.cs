@@ -17,6 +17,7 @@ namespace Studentify
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -42,6 +43,15 @@ namespace Studentify
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); //todo make more specific
+                    });
+            });
+            
             services.AddIdentity<StudentifyUser, IdentityRole>()
                 .AddEntityFrameworkStores<StudentifyDbContext>()
                 .AddDefaultTokenProviders();
@@ -114,6 +124,8 @@ namespace Studentify
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {
