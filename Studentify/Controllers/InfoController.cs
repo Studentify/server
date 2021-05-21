@@ -82,14 +82,7 @@ namespace Studentify.Controllers
                 Name = infoDto.Name,
                 ExpiryDate = infoDto.ExpiryDate,
                 MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
-                Address = new Address()
-                {
-                    Country = "test",
-                    Street = "test",
-                    Town = "test",
-                    HouseNumber = "test",
-                    PostalCode = "test"
-                },
+                Address = infoDto.Address,
                 Description = infoDto.Description,
                 AuthorId = account.Id,
                 Category = infoDto.Category,
