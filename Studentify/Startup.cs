@@ -12,6 +12,7 @@ using Studentify.Models.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Studentify.Data.Repositories;
+using Studentify.Models;
 
 namespace Studentify
 {
@@ -42,7 +43,8 @@ namespace Studentify
                 .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
-                .AddScoped<IInfosRepository, InfosRepository>();
+                .AddScoped<IInfosRepository, InfosRepository>()
+                .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>();
 
             services.AddCors(options =>
             {

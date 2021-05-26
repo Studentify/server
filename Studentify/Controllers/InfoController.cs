@@ -19,9 +19,12 @@ namespace Studentify.Controllers
     public class InfoController : ControllerBase
     {
         private readonly IInfosRepository _infosRepository;
-        public InfoController(IInfosRepository infosRepository)
+        private readonly IStudentifyAccountsRepository _accountsRepository;
+        public InfoController(IInfosRepository infosRepository, IStudentifyAccountsRepository accountsRepository)
         {
             _infosRepository = infosRepository;
+            _accountsRepository = accountsRepository;
+
         }
         
         // GET: api/Infos
@@ -87,28 +90,27 @@ namespace Studentify.Controllers
         [HttpPost]
         public async Task<ActionResult<Info>> PostInfo(InfoDto infoDto)
         {
-            // var username = User.Identity.Name;
+            var username = User.Identity.Name;
+            var account = await _accountsRepository.SelectByUsername(username);
             // StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
             // var account = await accountManager.FindAccountByUsername(username);
-            //
-            // var info = new Info()
-            // {
-            //     Name = infoDto.Name,
-            //     ExpiryDate = infoDto.ExpiryDate,
-            //     MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
-            //     Address = infoDto.Address,
-            //     Description = infoDto.Description,
-            //     AuthorId = account.Id,
-            //     Category = infoDto.Category,
-            // };
-            //
-            // info.CreationDate = DateTime.Now;
-            //
-            // _context.Infos.Add(info);
-            // await _context.SaveChangesAsync();
-            //
-            // return CreatedAtAction(nameof(GetInfo), new { id = info.Id }, info);
-            throw new NotImplementedException();
+
+            var info = new Info
+            {
+                Name = infoDto.Name,
+                ExpiryDate = infoDto.ExpiryDate,
+                MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
+                Address = infoDto.Address,
+                Description = infoDto.Description,
+                AuthorId = account.Id,
+                Category = infoDto.Category,
+                CreationDate = DateTime.Now,
+            };
+
+
+            await _infosRepository.Insert.One(info);
+            
+            return CreatedAtAction(nameof(GetInfo), new { id = info.Id }, info);
         }
     }
 }
