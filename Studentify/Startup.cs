@@ -11,11 +11,13 @@ using Microsoft.EntityFrameworkCore;
 using Studentify.Models.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Studentify.Data.Repositories;
 
 namespace Studentify
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,14 +32,30 @@ namespace Studentify
                 options
                     // .UseLazyLoadingProxies()
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), x => x.UseNetTopologySuite()));
-
+            
             services.AddControllers();
+            //services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.));
 
+            services
+                .AddScoped(typeof(ISelectRepository<>), typeof(SelectRepositoryBase<>))
+                .AddScoped(typeof(IInsertRepository<>), typeof(InsertRepositoryBase<>))
+                .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
+                .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
+                .AddScoped<IInfosRepository, InfosRepository>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); //todo make more specific
+                    });
+            });
+            
             services.AddIdentity<StudentifyUser, IdentityRole>()
                 .AddEntityFrameworkStores<StudentifyDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Authentication
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -45,7 +63,6 @@ namespace Studentify
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
 
-                // Jwt Bearer  
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
@@ -107,6 +124,8 @@ namespace Studentify
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {

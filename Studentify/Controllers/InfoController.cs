@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Studentify.Data;
+using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
@@ -70,7 +71,7 @@ namespace Studentify.Controllers
         // POST: api/Infos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Info>> PostInfo(InfoDTO infoDto)
+        public async Task<ActionResult<Info>> PostInfo(InfoDto infoDto)
         {
             var username = User.Identity.Name;
             StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
@@ -80,10 +81,10 @@ namespace Studentify.Controllers
             {
                 Name = infoDto.Name,
                 ExpiryDate = infoDto.ExpiryDate,
-                // Location = new Point(infoDto.Longitude, infoDto.Latitude),
-                Location = "test",  //todo change to new Point(infoDto.Longitude, infoDto.Latitude) when it works
+                MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
+                Address = infoDto.Address,
                 Description = infoDto.Description,
-                StudentifyAccountId = account.Id,
+                AuthorId = account.Id,
                 Category = infoDto.Category,
             };
             

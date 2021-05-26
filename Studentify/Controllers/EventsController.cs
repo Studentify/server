@@ -1,39 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Studentify.Data;
+using Studentify.Data.Repositories;
 using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class EventsController : ControllerBase
     {
-        private readonly StudentifyDbContext _context;
+        private readonly IStudentifyEventsRepository _studentifyEventsRepository;
 
-        public EventsController(StudentifyDbContext context)
+        public EventsController(IStudentifyEventsRepository studentifyEventsRepository)
         {
-            _context = context;
+            _studentifyEventsRepository = studentifyEventsRepository;
         }
 
         // GET: api/Events
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentifyEvent>>> GetEvents()
         {
-            Console.WriteLine(User.Identity.IsAuthenticated);
-            return await _context.Events.ToListAsync();
+            var studentifyEvents = await _studentifyEventsRepository.Select.All();
+            return studentifyEvents.ToList();
         }
 
         // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<StudentifyEvent>> GetEvent(int id)
         {
-            var studentifyEvent = await _context.Events.FindAsync(id);
+            var studentifyEvent = await _studentifyEventsRepository.Select.ById(id);
 
             if (studentifyEvent == null)
             {
@@ -47,15 +46,14 @@ namespace Studentify.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var studentifyEvent = await _context.Events.FindAsync(id);
-            if (studentifyEvent == null)
+            try
+            {
+                await _studentifyEventsRepository.Delete.ById(id);
+            }
+            catch (DataException e)
             {
                 return NotFound();
             }
-
-            _context.Events.Remove(studentifyEvent);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

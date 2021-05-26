@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Studentify.Data;
@@ -10,9 +11,10 @@ using Studentify.Data;
 namespace Studentify.Migrations
 {
     [DbContext(typeof(StudentifyDbContext))]
-    partial class StudentifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210519182321_ExtendLocationByAddress")]
+    partial class ExtendLocationByAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,9 +281,6 @@ namespace Studentify.Migrations
                     b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -302,11 +301,14 @@ namespace Studentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StudentifyAccountId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("StudentifyAccountId");
 
                     b.ToTable("Events");
 
@@ -393,7 +395,7 @@ namespace Studentify.Migrations
 
                     b.HasOne("Studentify.Models.StudentifyAccount", "Author")
                         .WithMany("Events")
-                        .HasForeignKey("AuthorId")
+                        .HasForeignKey("StudentifyAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
