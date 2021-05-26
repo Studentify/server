@@ -6,5 +6,6 @@ namespace Studentify.Data.Repositories
     {
         public ISelectRepository<Info> Select { get; }
         public IInsertRepository<Info> Insert { get; }
+        public IUpdateRepository<Info> Update { get; }
     }
 }

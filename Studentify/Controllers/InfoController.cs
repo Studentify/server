@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Studentify.Data;
+using Studentify.Data.Repositories;
 using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
@@ -16,25 +18,25 @@ namespace Studentify.Controllers
     [ApiController]
     public class InfoController : ControllerBase
     {
-        private readonly StudentifyDbContext _context;
-
-        public InfoController(StudentifyDbContext context)
+        private readonly IInfosRepository _infosRepository;
+        public InfoController(IInfosRepository infosRepository)
         {
-            _context = context;
+            _infosRepository = infosRepository;
         }
-
+        
         // GET: api/Infos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Info>>> GetInfos()
         {
-            return await _context.Infos.ToListAsync();
+            var infos = await _infosRepository.Select.All();
+            return infos.ToList();
         }
 
         // GET: api/Infos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Info>> GetInfo(int id)
         {
-            var info = await _context.Infos.FindAsync(id);
+            var info = await _infosRepository.Select.ById(id);
 
             if (info == null)
             {
@@ -46,25 +48,37 @@ namespace Studentify.Controllers
 
         // PUT: api/Infos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInfo(int id, Info info)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PutInfo(int id, InfoDto infoDto)
         {
-            if (id != info.Id)
+            Info info;
+            
+            try
+            {
+                info = await _infosRepository.Select.ById(id);
+            }
+            catch (DataException)
+            {
                 return BadRequest();
-
-            _context.Entry(info).State = EntityState.Modified;
+            }
+            
+            info.Name = infoDto.Name;
+            info.ExpiryDate = infoDto.ExpiryDate;
+            info.MapPoint.X = infoDto.Longitude;
+            info.MapPoint.Y = infoDto.Latitude;
+            info.Address = infoDto.Address;
+            info.Description = infoDto.Description;
+            info.Category = infoDto.Category;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _infosRepository.Update.One(info, id);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DataException)
             {
-                if (!InfoExists(id))
-                    return NotFound();
-                throw;
+                return NotFound();
             }
-
+            
             return NoContent();
         }
 
@@ -73,34 +87,28 @@ namespace Studentify.Controllers
         [HttpPost]
         public async Task<ActionResult<Info>> PostInfo(InfoDto infoDto)
         {
-            var username = User.Identity.Name;
-            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var account = await accountManager.FindAccountByUsername(username);
-
-            var info = new Info()
-            {
-                Name = infoDto.Name,
-                ExpiryDate = infoDto.ExpiryDate,
-                MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
-                Address = infoDto.Address,
-                Description = infoDto.Description,
-                AuthorId = account.Id,
-                Category = infoDto.Category,
-            };
-            
-            info.CreationDate = DateTime.Now;
-            
-            _context.Infos.Add(info);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetInfo), new { id = info.Id }, info);
-        }
-
-
-
-        private bool InfoExists(int id)
-        {
-            return _context.Infos.Any(e => e.Id == id);
+            // var username = User.Identity.Name;
+            // StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
+            // var account = await accountManager.FindAccountByUsername(username);
+            //
+            // var info = new Info()
+            // {
+            //     Name = infoDto.Name,
+            //     ExpiryDate = infoDto.ExpiryDate,
+            //     MapPoint = new Point(infoDto.Longitude, infoDto.Latitude) {SRID = 4326},
+            //     Address = infoDto.Address,
+            //     Description = infoDto.Description,
+            //     AuthorId = account.Id,
+            //     Category = infoDto.Category,
+            // };
+            //
+            // info.CreationDate = DateTime.Now;
+            //
+            // _context.Infos.Add(info);
+            // await _context.SaveChangesAsync();
+            //
+            // return CreatedAtAction(nameof(GetInfo), new { id = info.Id }, info);
+            throw new NotImplementedException();
         }
     }
 }
