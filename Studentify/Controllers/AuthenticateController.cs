@@ -37,7 +37,7 @@ namespace Studentify.Controllers
         /// <summary>
         /// Logging user with Studentify.Models.Authentication.LoginModel
         /// </summary>
-        /// <param name="model">
+        /// <param name="dto">
         /// User's credentials eg.
         /// {
         ///     "Username": "user",
@@ -50,10 +50,10 @@ namespace Studentify.Controllers
         /// </returns>
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            var user = await _userManager.FindByNameAsync(dto.Username);
+            if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -98,7 +98,7 @@ namespace Studentify.Controllers
         /// Register user in database with Studentify.Models.Authentication.RegisterModel
         /// and creates StudentifyAccount for him.
         /// </summary>
-        /// <param name="model">
+        /// <param name="dto">
         /// New user's credentials eg.
         /// {
         ///     "Username": "user",
@@ -114,22 +114,22 @@ namespace Studentify.Controllers
         /// </returns>
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var userExists = await _userManager.FindByNameAsync(model.Username);
-            var emailExists = await _userManager.FindByEmailAsync(model.Email);
+            var userExists = await _userManager.FindByNameAsync(dto.Username);
+            var emailExists = await _userManager.FindByEmailAsync(dto.Email);
             if (userExists != null || emailExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponse { Status = "Error", Message = "User already exists!" });
 
             StudentifyUser user = new StudentifyUser()
             {
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = dto.Username
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponse { Status = "Error", Message = "User creation failed! Please check user details and try again." });

@@ -60,7 +60,7 @@ namespace Studentify.Controllers
                 return BadRequest();
             }
 
-            account.User.UserName = accountDto.UserName;    //todo make changing username work
+            //account.User.UserName = accountDto.UserName;    //todo make changing username work
             account.User.FirstName = accountDto.FirstName;
             account.User.LastName = accountDto.LastName;
             account.User.Email = accountDto.Email;

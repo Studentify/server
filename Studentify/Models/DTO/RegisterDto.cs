@@ -7,7 +7,7 @@ namespace Studentify.Models.HttpBody
     /// Contains user credentials used
     /// to register new user to the application
     /// </summary>
-    public class RegisterModel
+    public class RegisterDto
     {
         [Required(ErrorMessage = "User Name is required")]
         public string Username { get; set; }
