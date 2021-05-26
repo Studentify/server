@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data;
+using System.Threading.Tasks;
 
 namespace Studentify.Data.Repositories
 {
@@ -11,7 +12,9 @@ namespace Studentify.Data.Repositories
         public async Task One(T entity)
         {
             Context.Set<T>().Add(entity);
-            await Context.SaveChangesAsync();
+            var numberOfAddedEntities = await Context.SaveChangesAsync();
+            if (numberOfAddedEntities < 1)
+                throw new DataException("Error during insert, no entities added.");
         }
     }
 }

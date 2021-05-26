@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Studentify.Data;
+using Studentify.Data.Repositories;
 using Studentify.Models.Authentication;
 using Studentify.Models.HttpBody;
 
@@ -24,13 +25,13 @@ namespace Studentify.Controllers
     {
         private readonly UserManager<StudentifyUser> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly StudentifyAccountCreator _creator;
+        private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public AuthenticateController(UserManager<StudentifyUser> userManager, IConfiguration configuration, StudentifyDbContext context)
+        public AuthenticateController(UserManager<StudentifyUser> userManager, IConfiguration configuration, IStudentifyAccountsRepository accountsRepository)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _creator = new StudentifyAccountCreator(context);
+            _accountsRepository = accountsRepository;
         }
 
         /// <summary>
@@ -133,10 +134,7 @@ namespace Studentify.Controllers
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponse { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-            var response = _creator.CreateAccount(user);
-
-            if (response.Status.Equals("Error"))
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            await _accountsRepository.InsertFromStudentifyUser(user);
 
             return Ok(new AuthResponse { Status = "Success", Message = "User created successfully!" });
         }

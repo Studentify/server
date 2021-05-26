@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Studentify.Models;
+using Studentify.Models.Authentication;
 
 namespace Studentify.Data.Repositories
 {
@@ -10,5 +11,6 @@ namespace Studentify.Data.Repositories
         public IUpdateRepository<StudentifyAccount> Update { get; set; }
         
         public Task<StudentifyAccount> SelectByUsername(string username);
+        public Task InsertFromStudentifyUser(StudentifyUser user);
     }
 }
