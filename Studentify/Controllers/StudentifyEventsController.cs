@@ -11,11 +11,11 @@ namespace Studentify.Controllers
     [Route("api/[controller]")]
     [ApiController]
     // [Authorize]
-    public class EventsController : ControllerBase
+    public class StudentifyEventsController : ControllerBase
     {
         private readonly IStudentifyEventsRepository _studentifyEventsRepository;
 
-        public EventsController(IStudentifyEventsRepository studentifyEventsRepository)
+        public StudentifyEventsController(IStudentifyEventsRepository studentifyEventsRepository)
         {
             _studentifyEventsRepository = studentifyEventsRepository;
         }
