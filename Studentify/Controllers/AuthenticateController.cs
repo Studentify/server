@@ -86,8 +86,7 @@ namespace Studentify.Controllers
                         user.FirstName,
                         user.LastName,
                         user.UserName,
-                        user.Email,
-                        user.PhoneNumber
+                        user.Email
                     }
                 });
             }

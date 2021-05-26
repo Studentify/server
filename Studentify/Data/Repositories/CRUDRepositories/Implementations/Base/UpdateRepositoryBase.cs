@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Studentify.Data.Repositories
 {
-    public class UpdateRepositoryBase<T> : RepositoryBase, IUpdateRepository<T>
+    public class UpdateRepositoryBase<T> : RepositoryBase, IUpdateRepository<T> where T : class
     {
         public UpdateRepositoryBase(StudentifyDbContext context) : base(context)
         {
@@ -21,15 +21,15 @@ namespace Studentify.Data.Repositories
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InfoExists(id))
+                if (!await EntityExists(id))
                     throw new DataException("Not found"); //todo change to better exception type
                 throw;
             }
         }
         
-        private bool InfoExists(int id)
+        private async Task<bool> EntityExists(int id)
         {
-            return Context.Infos.Any(e => e.Id == id);
+            return await Context.Set<T>().FindAsync() == null;
         }
     }
 }

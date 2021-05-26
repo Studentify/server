@@ -92,8 +92,6 @@ namespace Studentify.Controllers
         {
             var username = User.Identity.Name;
             var account = await _accountsRepository.SelectByUsername(username);
-            // StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            // var account = await accountManager.FindAccountByUsername(username);
 
             var info = new Info
             {
