@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using Studentify.Data;
+using Studentify.Data.Repositories;
+using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
+using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
@@ -16,63 +21,35 @@ namespace Studentify.Controllers
     [ApiController]
     public class MeetingsController : ControllerBase
     {
-        private readonly StudentifyDbContext _context;
+        private readonly IMeetingsRepository _meetingsRepository;
+        private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public MeetingsController(StudentifyDbContext context)
+        public MeetingsController(IMeetingsRepository meetingsRepository, IStudentifyAccountsRepository accountsRepository)
         {
-            _context = context;
+            _meetingsRepository = meetingsRepository;
+            _accountsRepository = accountsRepository;
         }
 
         // GET: api/Meetings
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Meeting>>> GetMeeting()
         {
-            await _context.Meetings.Include(m => m.Participants).LoadAsync();
-            return await _context.Meetings.ToListAsync();
+            var meetings = await _meetingsRepository.Select.All();
+            return meetings.ToList();
         }
 
         // GET: api/Meetings/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Meeting>> GetMeeting(int id)
         {
-            var studentifyMeeting = await _context.Meetings.FindAsync(id);
+            var meeting = await _meetingsRepository.Select.ById(id);
 
-            if (studentifyMeeting == null)
+            if (meeting == null)
             {
                 return NotFound();
             }
 
-            await _context.Meetings.Include(m => m.Participants).LoadAsync();
-            return studentifyMeeting;
-        }
-
-        // PUT: api/Meetings/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMeeting(int id, Meeting meeting)
-        {
-            if (id != meeting.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(meeting).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MeetingExists(id))
-                {
-                    return NotFound();
-                }
-
-                throw;
-            }
-
-            return NoContent();
+            return meeting;
         }
 
         [Authorize]
@@ -81,8 +58,9 @@ namespace Studentify.Controllers
         {
             try
             {
-                await _context.Meetings.Include(m => m.Participants).LoadAsync();
-                var meeting = await _context.Meetings.FindAsync(id);
+                //await _context.Meetings.Include(m => m.Participants).LoadAsync();
+                //var meeting = await _context.Meetings.FindAsync(id);
+                var meeting = await _meetingsRepository.Select.ById(id);
 
                 if (meeting == null)
                 {
@@ -94,61 +72,85 @@ namespace Studentify.Controllers
                 }
 
                 var username = User.Identity.Name;
-                StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-                var account = await accountManager.FindAccountByUsername(username);
+                var account = await _accountsRepository.SelectByUsername(username);
 
                 if (meeting.Participants.Contains(account))
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, $"User already participates");
                 }
 
-                meeting.Participants.Add(account);
-                await _context.SaveChangesAsync();
+                await _meetingsRepository.RegisterAttendance(meeting, account);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MeetingExists(id))
-                {
-                    return NotFound();
-                }
-
-                throw;
+                return NotFound();
             }
 
             return Ok("Participation saved");
+        }
+
+        // PUT: api/Infos/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PutMeeting(int id, MeetingDto meetingDto)
+        {
+            Meeting meeting;
+            
+            try
+            {
+                meeting = await _meetingsRepository.Select.ById(id);
+            }
+            catch (DataException)
+            {
+                return BadRequest();
+            }
+
+            meeting.Name = meetingDto.Name;
+            meeting.ExpiryDate = meetingDto.ExpiryDate;
+            meeting.MapPoint.X = meetingDto.Longitude;
+            meeting.MapPoint.Y = meetingDto.Latitude;
+            meeting.Address = meetingDto.Address;
+            meeting.Description = meetingDto.Description;
+            meeting.MaxNumberOfParticipants = meetingDto.MaxNumberOfParticipants;
+
+            try
+            {
+                await _meetingsRepository.Update.One(meeting, id);
+            }
+            catch (DataException)
+            {
+                return NotFound();
+            }
+            
+            return NoContent();
         }
 
         // POST: api/Meetings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Meeting>> PostMeeting(MeetingDTO meetingDto)
+        public async Task<ActionResult<Meeting>> PostMeeting(MeetingDto meetingDto)
         {
             var username = User.Identity.Name;
-            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var account = await accountManager.FindAccountByUsername(username);
+            var account = await _accountsRepository.SelectByUsername(username);
 
             var meeting = new Meeting()
             {
                 Name = meetingDto.Name,
                 ExpiryDate = meetingDto.ExpiryDate,
-                Location = "location",  //todo change to new Point(infoDto.Longitude, infoDto.Latitude) when it works
+                MapPoint = new Point(meetingDto.Longitude, meetingDto.Latitude) { SRID = 4326 },
+                Address = meetingDto.Address,
                 Description = meetingDto.Description,
-                StudentifyAccountId = account.Id,
+                AuthorId = account.Id,
+                CreationDate = DateTime.Now,
                 MaxNumberOfParticipants = meetingDto.MaxNumberOfParticipants,
             };
 
             meeting.CreationDate = DateTime.Now;
 
-            _context.Meetings.Add(meeting);
-            await _context.SaveChangesAsync();
+            await _meetingsRepository.Insert.One(meeting);
 
             return CreatedAtAction(nameof(GetMeeting), new { id = meeting.Id }, meeting);
-        }
-
-        private bool MeetingExists(int id)
-        {
-            return _context.Meetings.Any(e => e.Id == id);
         }
     }
 }
