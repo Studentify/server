@@ -20,13 +20,15 @@ namespace Studentify.Controllers
     {
         private readonly ITradeOffersRepository _tradeOffersRepository;
         private readonly IStudentifyAccountsRepository _accountsRepository;
-        public TradeOfferController(ITradeOffersRepository tradeOffersRepository, IStudentifyAccountsRepository accountsRepository)
+
+        public TradeOfferController(ITradeOffersRepository tradeOffersRepository,
+            IStudentifyAccountsRepository accountsRepository)
         {
             _tradeOffersRepository = tradeOffersRepository;
             _accountsRepository = accountsRepository;
 
         }
-        
+
         // GET: api/TradeOffers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TradeOffer>>> GetTradeOffers()
@@ -51,11 +53,11 @@ namespace Studentify.Controllers
 
         // PUT: api/TradeOffers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPatch("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> PutTradeOffer(int id, TradeOfferDto tradeOfferDto)
         {
             TradeOffer tradeOffer;
-            
+
             try
             {
                 tradeOffer = await _tradeOffersRepository.Select.ById(id);
@@ -65,6 +67,7 @@ namespace Studentify.Controllers
                 return BadRequest();
             }
             
+
             tradeOffer.Name = tradeOfferDto.Name;
             tradeOffer.ExpiryDate = tradeOfferDto.ExpiryDate;
             tradeOffer.MapPoint.X = tradeOfferDto.Longitude;
@@ -74,7 +77,7 @@ namespace Studentify.Controllers
             tradeOffer.Offer = tradeOfferDto.Offer;
             tradeOffer.Price = tradeOfferDto.Price;
             tradeOffer.BuyerId = tradeOfferDto.BuyerId;
-            
+
             try
             {
                 await _tradeOffersRepository.Update.One(tradeOffer, id);
@@ -83,7 +86,7 @@ namespace Studentify.Controllers
             {
                 return NotFound();
             }
-            
+
             return NoContent();
         }
 
@@ -111,18 +114,18 @@ namespace Studentify.Controllers
 
 
             await _tradeOffersRepository.Insert.One(tradeOffer);
-            
-            return CreatedAtAction(nameof(GetTradeOffer), new { id = tradeOffer.Id }, tradeOffer);
+
+            return CreatedAtAction(nameof(GetTradeOffer), new {id = tradeOffer.Id}, tradeOffer);
         }
-        
-        
-        // Patch: api/TradeOffers/5
+
+
+        // Patch: api/TradeOffers/5/accept
         // To accept offer
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}/accept")]
         public async Task<IActionResult> PatchTradeOffer(int id)
         {
             TradeOffer tradeOffer;
-            
+
             try
             {
                 tradeOffer = await _tradeOffersRepository.Select.ById(id);
@@ -133,9 +136,16 @@ namespace Studentify.Controllers
             }
 
             var username = User.Identity.Name;
-            var currentUserId = _accountsRepository.SelectByUsername(username).Id;
-            tradeOffer.BuyerId = currentUserId;
-            
+            try
+            {
+                var userId = _accountsRepository.SelectByUsername(username).Id;
+                tradeOffer.BuyerId = userId;
+            }
+            catch (DataException)
+            {
+                return BadRequest();
+            }
+
             try
             {
                 await _tradeOffersRepository.Update.One(tradeOffer, id);
@@ -144,9 +154,8 @@ namespace Studentify.Controllers
             {
                 return NotFound();
             }
-            
+
             return NoContent();
         }
-        
     }
 }

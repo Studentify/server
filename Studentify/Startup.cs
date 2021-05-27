@@ -44,6 +44,7 @@ namespace Studentify
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>()
+                .AddScoped<ITradeOffersRepository, TradeOffersRepository>()
                 .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>();
 
             services.AddCors(options =>
