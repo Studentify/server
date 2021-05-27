@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 namespace Studentify.IntegrationTests
 {
     public class BasicTests
-        : IClassFixture<WebApplicationFactory<Startup>>
+        : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
 
-        public BasicTests(WebApplicationFactory<Startup> factory)
+        public BasicTests(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
