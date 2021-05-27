@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Studentify.Data;
+using Studentify.Data.Repositories;
+using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
 using Studentify.Models.HttpBody;
 using Studentify.Models.Messages;
 using Studentify.Models.StudentifyEvents;
@@ -16,33 +18,34 @@ namespace Studentify.Controllers
     [ApiController]
     public class ThreadsController : ControllerBase
     {
-        private readonly StudentifyDbContext _context;
+        private readonly IThreadsRepository _threadsRepository;
+        private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public ThreadsController(StudentifyDbContext context)
+        public ThreadsController(IThreadsRepository threadsRepository, IStudentifyAccountsRepository accountsRepository)
         {
-            _context = context;
+            _threadsRepository = threadsRepository;
+            _accountsRepository = accountsRepository;
         }
 
         // GET: api/Threads
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Thread>>> GetThreads()
         {
-            await _context.Threads.Include(t => t.UserAccount).LoadAsync();
-            return await _context.Threads.ToListAsync();
+            var threads = await _threadsRepository.Select.All();
+            return threads.ToList();
         }
 
         // GET: api/Threads/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Thread>> GetThread(int id)
         {
-            var thread = await _context.Threads.FindAsync(id);
+            var thread = await _threadsRepository.Select.ById(id);
 
             if (thread == null)
             {
                 return NotFound();
             }
 
-            await _context.Threads.Include(t => t.UserAccount).LoadAsync();
             return thread;
         }
 
@@ -53,8 +56,7 @@ namespace Studentify.Controllers
         public async Task<ActionResult<Thread>> PostThread(int eventId)
         {
             var username = User.Identity.Name;
-            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var account = await accountManager.FindAccountByUsername(username);
+            var account = await _accountsRepository.SelectByUsername(username);
 
             var thread = new Thread()
             {
@@ -62,8 +64,7 @@ namespace Studentify.Controllers
                 UserAccount = account
             };
 
-            _context.Threads.Add(thread);
-            await _context.SaveChangesAsync();
+            await _threadsRepository.Insert.One(thread);
 
             return CreatedAtAction(nameof(GetThread), new { id = thread.Id }, thread);
         }
@@ -72,16 +73,15 @@ namespace Studentify.Controllers
         [HttpGet("Messages")]
         public async Task<ActionResult<IEnumerable<Message>>> GetAllMessages()
         {
-            await _context.Threads.Include(m => m.UserAccount).LoadAsync();
-            return await _context.Messages.ToListAsync();
+            var messages = await _threadsRepository.SelectMessages.All();
+            return messages.ToList();
         }
 
         // GET: api/Threads/Messages/5
         [HttpGet("Messages/{threadId}")]
         public async Task<ActionResult<IEnumerable<Message>>> GetMessages(int threadId)
         {
-            await _context.Threads.Include(m => m.UserAccount).LoadAsync();
-            var messages = await _context.Messages.ToListAsync();
+            var messages = await _threadsRepository.SelectMessages.All();
             return messages.Where(m => m.ThreadId == threadId).ToList();
         }
 
@@ -89,14 +89,13 @@ namespace Studentify.Controllers
         [HttpGet("Message/{id}")]
         public async Task<ActionResult<Message>> GetMessage(int id)
         {
-            var message = await _context.Messages.FindAsync(id);
+            var message = await _threadsRepository.SelectMessages.ById(id);
 
             if (message == null)
             {
                 return NotFound();
             }
 
-            await _context.Threads.Include(m => m.UserAccount).LoadAsync();
             return message;
         }
 
@@ -107,11 +106,11 @@ namespace Studentify.Controllers
         public async Task<ActionResult<Thread>> PostMessage(MessageDto messageDto)
         {
             var username = User.Identity.Name;
-            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var account = await accountManager.FindAccountByUsername(username);
+            var account = await _accountsRepository.SelectByUsername(username);
 
-            await _context.Threads.Include(t => t.Messages).LoadAsync();
-            var thread = await _context.Threads.FindAsync(messageDto.ThreadId);
+            //await _context.Threads.Include(t => t.Messages).LoadAsync();
+            //var thread = await _context.Threads.FindAsync(messageDto.ThreadId);
+            var thread = await _threadsRepository.Select.ById(messageDto.ThreadId);
 
             var message = new Message()
             {
@@ -122,9 +121,8 @@ namespace Studentify.Controllers
                 Thread = thread
             };
 
-            _context.Messages.Add(message);
-            thread.Messages.Add(message);
-            await _context.SaveChangesAsync();
+            await _threadsRepository.InsertMessages.One(message);
+            await _threadsRepository.AddMessageToThread(thread, message);
 
             return CreatedAtAction(nameof(GetMessage), new { id = message.Id }, message);
         }
