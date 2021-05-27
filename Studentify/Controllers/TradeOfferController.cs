@@ -114,5 +114,39 @@ namespace Studentify.Controllers
             
             return CreatedAtAction(nameof(GetTradeOffer), new { id = tradeOffer.Id }, tradeOffer);
         }
+        
+        
+        // Patch: api/TradeOffers/5
+        // To accept offer
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchTradeOffer(int id)
+        {
+            TradeOffer tradeOffer;
+            
+            try
+            {
+                tradeOffer = await _tradeOffersRepository.Select.ById(id);
+            }
+            catch (DataException)
+            {
+                return BadRequest();
+            }
+
+            var username = User.Identity.Name;
+            var currentUserId = _accountsRepository.SelectByUsername(username).Id;
+            tradeOffer.BuyerId = currentUserId;
+            
+            try
+            {
+                await _tradeOffersRepository.Update.One(tradeOffer, id);
+            }
+            catch (DataException)
+            {
+                return NotFound();
+            }
+            
+            return NoContent();
+        }
+        
     }
 }
