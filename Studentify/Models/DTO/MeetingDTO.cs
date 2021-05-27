@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Studentify.Models.HttpBody
 {
-    public class MeetingDTO : StudentifyEventDto
+    public class MeetingDto : StudentifyEventDto
     {
         public int MaxNumberOfParticipants { get; set; }
     }
