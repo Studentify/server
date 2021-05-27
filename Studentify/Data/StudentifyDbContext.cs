@@ -11,6 +11,7 @@ namespace Studentify.Data
         public DbSet<StudentifyAccount> StudentifyAccounts { get; set; }
         public DbSet<StudentifyEvent> Events { get; set; }
         public DbSet<Info> Infos { get; set; }
+        public DbSet<Meeting> Meetings { get; set; }
 
         public StudentifyDbContext(DbContextOptions<StudentifyDbContext> options) : base(options)
         {

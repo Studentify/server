@@ -20,5 +20,6 @@ namespace Studentify.Models
         [JsonIgnore] public StudentifyUser User { get; set; }
         [JsonIgnore] public List<StudentifyEvent> Events { get; set; }
         [Required, JsonIgnore] public string StudentifyUserId { get; set; }
+        [JsonIgnore] public List<Meeting> Meetings { get; set; }
     }
 }
