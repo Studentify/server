@@ -6,36 +6,37 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using System.Text.Json;
+using System.Linq;
 
 using Studentify.Models.HttpBody;
+using Studentify.IntegrationTests.GetDto;
 
 namespace Studentify.IntegrationTests
 {
     public class TestStudentifyAccounts
     {
-        private TestAppFactory<Startup> factory;
+        private readonly TestAppFactory<Startup> _factory = new();
+        private HttpClient _client;
+        private readonly RegisterDto _testUser = new()
+        {
+            Username = "Testiman",
+            Email = "test@test.test",
+            FirstName = "Test",
+            LastName = "Testowsky",
+            Password = "Test123!"
+        };
 
-        [SetUp]
+        [OneTimeSetUp]
         public async Task RegisterTestUser()
         {
-            factory = new TestAppFactory<Startup>();
-
-            var client = factory.CreateClient();
-            var testUser = new RegisterDto()
-            {
-                Username = "Testiman",
-                Email = "test@test.test",
-                FirstName = "Test",
-                LastName = "Testowsky",
-                Password = "Test123!"
-            };
+            var client = _factory.CreateClient();
 
             using var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri("api/authenticate/register", UriKind.Relative),
                 Content = new StringContent(
-                    JsonSerializer.Serialize(testUser),
+                    JsonSerializer.Serialize(_testUser),
                     Encoding.UTF8,
                     MediaTypeNames.Application.Json)
             };
@@ -44,64 +45,25 @@ namespace Studentify.IntegrationTests
             response.EnsureSuccessStatusCode();
         }
 
-        class StudentifyAccountGetDto
+        [SetUp]
+        public void CreateNewClient()
         {
-            public int Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Username { get; set; }
-            public string Email { get; set; }
-
-            private static bool CompareWithDto(StudentifyAccountGetDto a, RegisterDto dto)
-            {
-                if (a is null) return false;
-                if (dto is null) return false;
-                if (a.FirstName != dto.FirstName) return false;
-                if (a.LastName != dto.LastName) return false;
-                if (a.Username != dto.Username) return false;
-                if (a.Email != dto.Email) return false;
-                return true;
-            }
-
-            public static bool operator == (StudentifyAccountGetDto a, RegisterDto dto)
-            {
-                return CompareWithDto(a, dto);
-            }
-
-            public static bool operator != (StudentifyAccountGetDto a, RegisterDto dto)
-            {
-                return !CompareWithDto(a, dto);
-            }
-
-            public override bool Equals(object o)
-            {
-                RegisterDto dto = o as RegisterDto;
-                if (dto is null) return false;
-                return CompareWithDto(this, dto);
-            }
+            _client = _factory.CreateClient();
         }
 
         [Test]
         public async Task CheckIfRegistered()
         {
-            var expectedAccount = new RegisterDto()
-            {
-                Username = "Testiman",
-                Email = "test@test.test",
-                FirstName = "Test",
-                LastName = "Testowsky",
-                Password = "Test123!"
-            };
-
-            var client = factory.CreateClient();
-            var response = await client.GetAsync("/api/StudentifyAccounts");
+            var response = await _client.GetAsync("/api/StudentifyAccounts");
             response.EnsureSuccessStatusCode();
 
             var body = await response.Content.ReadAsStringAsync();
-            var receivedAccount = JsonSerializer.Deserialize<List<StudentifyAccountGetDto>>(
-                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true })[0];
+            var accounts = JsonSerializer.Deserialize<List<StudentifyAccountGetDto>>(body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            
+            var receivedAccount = (from a in accounts where a == _testUser select a).FirstOrDefault();
+            //var receivedAccount = accounts.Where(a => a == _testUser).FirstOrDefault();
 
-            Assert.True(receivedAccount == expectedAccount);
+            Assert.False(receivedAccount is null);
         }
     }
 }
