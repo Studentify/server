@@ -18,6 +18,7 @@ namespace Studentify.IntegrationTests
         [Theory]
         [InlineData("/api/Info")]
         [InlineData("/api/StudentifyAccounts")]
+        [InlineData("/api/StudentifyEvents")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
