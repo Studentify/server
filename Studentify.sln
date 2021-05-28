@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studentify", "Studentify\St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studentify.Test", "Studentify.Test\Studentify.Test.csproj", "{48F044AE-5823-4D1B-B61A-EEE9E97A5359}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Studentify.IntegrationTests", "Studentify.IntegrationTests\Studentify.IntegrationTests.csproj", "{2B10F55B-BFCF-42DA-8666-B4DA472347D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studentify.IntegrationTests", "Studentify.IntegrationTests\Studentify.IntegrationTests.csproj", "{4E9BE901-F867-4D6A-A570-5C31D036CDEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{48F044AE-5823-4D1B-B61A-EEE9E97A5359}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48F044AE-5823-4D1B-B61A-EEE9E97A5359}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48F044AE-5823-4D1B-B61A-EEE9E97A5359}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B10F55B-BFCF-42DA-8666-B4DA472347D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B10F55B-BFCF-42DA-8666-B4DA472347D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B10F55B-BFCF-42DA-8666-B4DA472347D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B10F55B-BFCF-42DA-8666-B4DA472347D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E9BE901-F867-4D6A-A570-5C31D036CDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E9BE901-F867-4D6A-A570-5C31D036CDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E9BE901-F867-4D6A-A570-5C31D036CDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E9BE901-F867-4D6A-A570-5C31D036CDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
