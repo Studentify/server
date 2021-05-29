@@ -58,17 +58,15 @@ namespace Studentify.Controllers
         {
             try
             {
-                //await _context.Meetings.Include(m => m.Participants).LoadAsync();
-                //var meeting = await _context.Meetings.FindAsync(id);
                 var meeting = await _meetingsRepository.Select.ById(id);
 
                 if (meeting == null)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"There is no meeting for id = {id}");
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"There is no meeting for id = {id}");  //todo change to other code
                 }
                 if (meeting.Participants.Count == meeting.MaxNumberOfParticipants)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"Maximum number of participants has been reached");
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"Maximum number of participants has been reached");      //todo change to other code
                 }
 
                 var username = User.Identity.Name;
@@ -76,7 +74,7 @@ namespace Studentify.Controllers
 
                 if (meeting.Participants.Contains(account))
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"User already participates");
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"User already participates");    //todo change to other code
                 }
 
                 await _meetingsRepository.RegisterAttendance(meeting, account);
