@@ -8,7 +8,7 @@ using Studentify.Data;
 
 namespace Studentify.IntegrationTests
 {
-    public class TestAppFactory<TStartup>
+    public class AppFactory<TStartup>
     : WebApplicationFactory<TStartup> where TStartup : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -33,7 +33,7 @@ namespace Studentify.IntegrationTests
                     var scopedServices = scope.ServiceProvider;
                     var db = scopedServices.GetRequiredService<StudentifyDbContext>();
                     var logger = scopedServices
-                        .GetRequiredService<ILogger<TestAppFactory<TStartup>>>();
+                        .GetRequiredService<ILogger<AppFactory<TStartup>>>();
 
                     db.Database.EnsureCreated();
                 }
