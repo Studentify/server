@@ -19,12 +19,14 @@ namespace Studentify.Controllers
     public class ThreadsController : ControllerBase
     {
         private readonly IThreadsRepository _threadsRepository;
+        private readonly IMessagesRepository _messagesRepository;
         private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public ThreadsController(IThreadsRepository threadsRepository, IStudentifyAccountsRepository accountsRepository)
+        public ThreadsController(IThreadsRepository threadsRepository, IMessagesRepository messagesRepository, IStudentifyAccountsRepository accountsRepository)
         {
             _threadsRepository = threadsRepository;
             _accountsRepository = accountsRepository;
+            _messagesRepository = messagesRepository;
         }
 
         // GET: api/Threads
@@ -73,7 +75,7 @@ namespace Studentify.Controllers
         [HttpGet("Messages")]
         public async Task<ActionResult<IEnumerable<Message>>> GetAllMessages()
         {
-            var messages = await _threadsRepository.SelectMessages.All();
+            var messages = await _messagesRepository.Select.All();
             return messages.ToList();
         }
 
@@ -81,15 +83,15 @@ namespace Studentify.Controllers
         [HttpGet("Messages/{threadId}")]
         public async Task<ActionResult<IEnumerable<Message>>> GetMessages(int threadId)
         {
-            var messages = await _threadsRepository.SelectMessages.All();
-            return messages.Where(m => m.ThreadId == threadId).ToList();
+            var messages = await _messagesRepository.SelectAllFromThread(threadId);
+            return messages.ToList();
         }
 
         // GET: api/Threads/Message/5
         [HttpGet("Message/{id}")]
         public async Task<ActionResult<Message>> GetMessage(int id)
         {
-            var message = await _threadsRepository.SelectMessages.ById(id);
+            var message = await _messagesRepository.Select.ById(id);
 
             if (message == null)
             {
@@ -121,8 +123,7 @@ namespace Studentify.Controllers
                 Thread = thread
             };
 
-            await _threadsRepository.InsertMessages.One(message);
-            await _threadsRepository.AddMessageToThread(thread, message);
+            await _messagesRepository.PostNewMessage(thread, message);
 
             return CreatedAtAction(nameof(GetMessage), new { id = message.Id }, message);
         }

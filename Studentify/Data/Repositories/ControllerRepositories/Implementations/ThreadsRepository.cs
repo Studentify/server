@@ -14,16 +14,10 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
         public IInsertRepository<Thread> Insert { get; }
         public IUpdateRepository<Thread> Update { get; }
         public ISelectRepository<Thread> Select { get; set; }
-        public ISelectRepository<Message> SelectMessages { get; }
-        public IInsertRepository<Message> InsertMessages { get; }
-        public IUpdateRepository<Message> UpdateMessages { get; }
         public ThreadsRepository(StudentifyDbContext context,
                                ISelectRepository<Thread> selectRepository,
                                IInsertRepository<Thread> insertRepository,
-                               IUpdateRepository<Thread> updateRepository,
-                               ISelectRepository<Message> selectMessagesRepository,
-                               IInsertRepository<Message> insertMessagesRepository,
-                               IUpdateRepository<Message> updateMessagesRepository
+                               IUpdateRepository<Thread> updateRepository
                                ) : base(context)
         {
             Insert = insertRepository;
@@ -39,31 +33,6 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
                     await Context.Entry(user).Reference(i => i.User).LoadAsync();
                 }
             };
-
-            InsertMessages = insertMessagesRepository;
-            UpdateMessages = updateMessagesRepository;
-            SelectMessages = selectMessagesRepository;
-
-            SelectMessages.FillWithReferences += async entities =>
-            {
-                var threads = await Context.Set<Thread>().ToListAsync();
-                foreach (var thread in threads)
-                {
-                    await Context.Entry(thread).Reference(t => t.UserAccount).LoadAsync();
-                    await Context.Entry(thread).Collection(t => t.Messages).LoadAsync();
-                }
-                var users = await Context.Set<StudentifyAccount>().ToListAsync();
-                foreach (var user in users)
-                {
-                    await Context.Entry(user).Reference(i => i.User).LoadAsync();
-                }
-            };
-        }
-
-        public async Task AddMessageToThread(Thread thread, Message message)
-        {
-            thread.Messages.Add(message);
-            await Context.SaveChangesAsync();
         }
     }
 }

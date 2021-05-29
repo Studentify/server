@@ -47,7 +47,8 @@ namespace Studentify
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>()
                 .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>()
-                .AddScoped<IThreadsRepository, ThreadsRepository>();
+                .AddScoped<IThreadsRepository, ThreadsRepository>()
+                .AddScoped<IMessagesRepository, MessagesRepository>();
 
             services.AddCors(options =>
             {
