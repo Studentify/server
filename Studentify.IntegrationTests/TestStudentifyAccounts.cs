@@ -15,19 +15,54 @@ namespace Studentify.IntegrationTests
 {
     public class TestStudentifyAccounts
     {
-        private readonly TestAppFactory<Startup> _factory = new();
+        private readonly AppFactory<Startup> _factory = new();
         private HttpClient _client;
         private readonly RegisterDto _testUser = new()
         {
-            Username = "Testiman",
-            Email = "test@test.test",
+            Username = "Testiman_accounts",
+            Email = "test_accounts@test.test",
             FirstName = "Test",
             LastName = "Testowsky",
             Password = "Test123!"
         };
+        private LoginGetDto _loginData;
+
+        private async Task<List<StudentifyAccountGetDto>> GetAllStudentifyAccounts()
+        {
+            var response = await _client.GetAsync("/api/StudentifyAccounts");
+            response.EnsureSuccessStatusCode();
+
+            var body = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<StudentifyAccountGetDto>>(
+                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+
+        private async Task<LoginGetDto> Login()
+        {
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("api/authenticate/login", UriKind.Relative),
+                Content = new StringContent(
+                    JsonSerializer.Serialize(
+                    new LoginDto
+                    {
+                        Username = _testUser.Username,
+                        Password = _testUser.Password
+                    }),
+                    Encoding.UTF8,
+                    MediaTypeNames.Application.Json)
+            };
+
+            var response = await _client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<LoginGetDto>(
+                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
 
         [OneTimeSetUp]
-        public async Task RegisterTestUser()
+        public async Task Register()
         {
             var client = _factory.CreateClient();
 
@@ -46,24 +81,59 @@ namespace Studentify.IntegrationTests
         }
 
         [SetUp]
-        public void CreateNewClient()
+        public async Task CreateNewClient()
         {
             _client = _factory.CreateClient();
+            _loginData = await Login();
         }
 
         [Test]
-        public async Task CheckIfRegistered()
+        public async Task TestGetStudentifyAccounts()
         {
-            var response = await _client.GetAsync("/api/StudentifyAccounts");
-            response.EnsureSuccessStatusCode();
-
-            var body = await response.Content.ReadAsStringAsync();
-            var accounts = JsonSerializer.Deserialize<List<StudentifyAccountGetDto>>(body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-            
-            var receivedAccount = (from a in accounts where a == _testUser select a).FirstOrDefault();
+            var accounts = await GetAllStudentifyAccounts();
+            var testUserAccount = (from a in accounts where a == _testUser select a).FirstOrDefault();
             //var receivedAccount = accounts.Where(a => a == _testUser).FirstOrDefault();
 
-            Assert.False(receivedAccount is null);
+            Assert.False(testUserAccount is null);
+        }
+
+        [Test]
+        public async Task TestPatchStudentifyAccounts()
+        {
+            var patchedUser = new RegisterDto()
+            {
+                Username = _testUser.Username,
+                Password = _testUser.Password,
+                Email = "patch" + _testUser.Email,
+                FirstName = "patch" + _testUser.FirstName,
+                LastName = "patch" + _testUser.LastName
+            };
+
+            var patchedUserDto = new StudentifyAccountDto()
+            {
+                Email = patchedUser.Email,
+                FirstName = patchedUser.FirstName,
+                LastName = patchedUser.LastName
+            };
+
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri("/api/StudentifyAccounts", UriKind.Relative), 
+                Content = new StringContent(JsonSerializer.Serialize(patchedUserDto),
+                    Encoding.UTF8,
+                    MediaTypeNames.Application.Json)
+            };
+
+            request.Headers.Add("Authorization", "Bearer " + _loginData.Token);
+
+            var reponse = await _client.SendAsync(request);
+            reponse.EnsureSuccessStatusCode();
+
+            var accounts = await GetAllStudentifyAccounts();
+            var testUserAccount = (from a in accounts where a == patchedUser select a).FirstOrDefault();
+
+            Assert.False(testUserAccount is null);
         }
     }
 }
