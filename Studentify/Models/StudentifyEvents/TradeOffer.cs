@@ -7,7 +7,7 @@ namespace Studentify.Models.StudentifyEvents
         [Required] public string Price { get; set; }
         [Required] public string Offer { get; set; }
         
-        public int BuyerId { get; set; }
+        public int? BuyerId { get; set; }
     }
 
 }

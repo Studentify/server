@@ -11,6 +11,6 @@ namespace Studentify.Models.HttpBody
         [Required(ErrorMessage = "Offer is required")]
         public string Offer { get; set; }
         
-        public int BuyerId { get; set; }
+        public int? BuyerId { get; set; }
     }
 }

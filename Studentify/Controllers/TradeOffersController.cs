@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -16,12 +17,12 @@ namespace Studentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TradeOfferController : ControllerBase
+    public class TradeOffersController : ControllerBase
     {
         private readonly ITradeOffersRepository _tradeOffersRepository;
         private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public TradeOfferController(ITradeOffersRepository tradeOffersRepository,
+        public TradeOffersController(ITradeOffersRepository tradeOffersRepository,
             IStudentifyAccountsRepository accountsRepository)
         {
             _tradeOffersRepository = tradeOffersRepository;
@@ -38,7 +39,7 @@ namespace Studentify.Controllers
         }
 
         // GET: api/TradeOffers/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<TradeOffer>> GetTradeOffer(int id)
         {
             var tradeOffer = await _tradeOffersRepository.Select.ById(id);
@@ -51,10 +52,10 @@ namespace Studentify.Controllers
             return tradeOffer;
         }
 
-        // PUT: api/TradeOffers/5
+        // PATCH: api/TradeOffers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTradeOffer(int id, TradeOfferDto tradeOfferDto)
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> PatchTradeOffer(int id, TradeOfferDto tradeOfferDto)
         {
             TradeOffer tradeOffer;
 
@@ -109,10 +110,9 @@ namespace Studentify.Controllers
                 CreationDate = DateTime.Now,
                 Offer = tradeOfferDto.Offer,
                 Price = tradeOfferDto.Price,
-                BuyerId = tradeOfferDto.BuyerId
+                BuyerId = tradeOfferDto.BuyerId     //todo add checking if this id is correct, maybe through reference
             };
-
-
+            
             await _tradeOffersRepository.Insert.One(tradeOffer);
 
             return CreatedAtAction(nameof(GetTradeOffer), new {id = tradeOffer.Id}, tradeOffer);
@@ -120,9 +120,8 @@ namespace Studentify.Controllers
 
 
         // Patch: api/TradeOffers/5/accept
-        // To accept offer
-        [HttpPatch("{id}/accept")]
-        public async Task<IActionResult> PatchTradeOffer(int id)
+        [HttpPatch("{id:int}/accept")]
+        public async Task<IActionResult> AcceptTradeOffer(int id)
         {
             TradeOffer tradeOffer;
 
@@ -132,18 +131,18 @@ namespace Studentify.Controllers
             }
             catch (DataException)
             {
-                return BadRequest();
+                return BadRequest("Wrong tradeOffer id");
             }
 
             var username = User.Identity.Name;
             try
             {
-                var userId = _accountsRepository.SelectByUsername(username).Id;
-                tradeOffer.BuyerId = userId;
+                var user = await _accountsRepository.SelectByUsername(username);
+                tradeOffer.BuyerId = user.Id;
             }
             catch (DataException)
             {
-                return BadRequest();
+                return BadRequest("Could not get current user id");
             }
 
             try
@@ -152,7 +151,7 @@ namespace Studentify.Controllers
             }
             catch (DataException)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status410Gone, "TradeOffer is not available any more");
             }
 
             return NoContent();
