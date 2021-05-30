@@ -50,7 +50,7 @@ namespace Studentify.Controllers
             {
                 await _studentifyEventsRepository.Delete.ById(id);
             }
-            catch (DataException e)
+            catch (DataException)
             {
                 return NotFound();
             }
