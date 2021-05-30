@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Models;
 using Studentify.Models.HttpBody;

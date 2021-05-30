@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Identity;
 using Studentify.Models.Authentication;
 using Studentify.Models.StudentifyEvents;
 

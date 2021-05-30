@@ -4,10 +4,7 @@ using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Implementations;
 using Studentify.Models.Messages;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Studentify.Test

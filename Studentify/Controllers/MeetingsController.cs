@@ -8,10 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
-using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
