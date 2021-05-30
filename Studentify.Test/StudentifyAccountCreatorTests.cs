@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Studentify.Data;
-using Studentify.Migrations;
+using Studentify.Data.Repositories;
 using Studentify.Models;
 using Studentify.Models.Authentication;
 
@@ -21,15 +18,19 @@ namespace Studentify.Test
         public void Setup()
         {
             _dbContextOptions = new DbContextOptionsBuilder<StudentifyDbContext>()
-                                    .UseInMemoryDatabase(databaseName: "StudentifyDb")
-                                    .Options;
+                .UseInMemoryDatabase(databaseName: "StudentifyDb")
+                .Options;
         }
 
         [Test]
         public async Task CreateAccountSuccess()
         {
             await using var context = new StudentifyDbContext(_dbContextOptions);
-            StudentifyAccountCreator creator = new StudentifyAccountCreator(context);
+            var accountsRepository = new StudentifyAccountsRepository(context,
+                new SelectRepositoryBase<StudentifyAccount>(context),
+                new UpdateRepositoryBase<StudentifyAccount>(context),
+                new InsertRepositoryBase<StudentifyAccount>(context));
+
             const int expectedNumberOfAccounts = 1;
 
             StudentifyUser user = new StudentifyUser()
@@ -37,13 +38,12 @@ namespace Studentify.Test
                 UserName = "test-user",
             };
 
-            var response = creator.CreateAccount(user);
-            StudentifyAccount[] accounts = await context.StudentifyAccounts
-                                                        .Where(acc => acc.StudentifyUserId == user.Id)
-                                                        .ToArrayAsync();
+            await accountsRepository.InsertFromStudentifyUser(user);
 
-            Assert.AreEqual("Success", response.Status);
-            Assert.AreEqual(expectedNumberOfAccounts, accounts.Length);
+            var accounts = (await accountsRepository.Select.All())
+                .Where(acc => acc.StudentifyUserId == user.Id).ToList();
+            
+            Assert.AreEqual(expectedNumberOfAccounts, accounts.Count);
         }
     }
 }

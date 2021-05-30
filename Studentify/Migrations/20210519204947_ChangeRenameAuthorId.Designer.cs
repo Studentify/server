@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Studentify.Data;
@@ -10,30 +11,16 @@ using Studentify.Data;
 namespace Studentify.Migrations
 {
     [DbContext(typeof(StudentifyDbContext))]
-    partial class StudentifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210519204947_ChangeRenameAuthorId")]
+    partial class ChangeRenameAuthorId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("MeetingStudentifyAccount", b =>
-                {
-                    b.Property<int>("MeetingsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MeetingsId", "ParticipantsId");
-
-                    b.HasIndex("ParticipantsId");
-
-                    b.ToTable("MeetingStudentifyAccount");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -266,60 +253,6 @@ namespace Studentify.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Studentify.Models.Messages.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsViewed")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ThreadId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("ThreadId");
-
-                    b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("Studentify.Models.Messages.Thread", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ReferencedEventId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserAccountId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReferencedEventId");
-
-                    b.HasIndex("UserAccountId");
-
-                    b.ToTable("Threads");
-                });
-
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -392,49 +325,6 @@ namespace Studentify.Migrations
                     b.HasDiscriminator().HasValue("Info");
                 });
 
-            modelBuilder.Entity("Studentify.Models.StudentifyEvents.TradeOffer", b =>
-                {
-                    b.HasBaseType("Studentify.Models.StudentifyEvents.StudentifyEvent");
-
-                    b.Property<int>("BuyerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Offer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Price")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("TradeOffer");
-                });    
-                    
-            modelBuilder.Entity("Studentify.Models.StudentifyEvents.Meeting", b =>
-                {
-                    b.HasBaseType("Studentify.Models.StudentifyEvents.StudentifyEvent");
-
-                    b.Property<int>("MaxNumberOfParticipants")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("Meeting");
-                });
-
-            modelBuilder.Entity("MeetingStudentifyAccount", b =>
-                {
-                    b.HasOne("Studentify.Models.StudentifyEvents.Meeting", null)
-                        .WithMany()
-                        .HasForeignKey("MeetingsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Studentify.Models.StudentifyAccount", null)
-                        .WithMany()
-                        .HasForeignKey("ParticipantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -486,40 +376,6 @@ namespace Studentify.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Studentify.Models.Messages.Message", b =>
-                {
-                    b.HasOne("Studentify.Models.StudentifyAccount", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("Studentify.Models.Messages.Thread", "Thread")
-                        .WithMany("Messages")
-                        .HasForeignKey("ThreadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Thread");
-                });
-
-            modelBuilder.Entity("Studentify.Models.Messages.Thread", b =>
-                {
-                    b.HasOne("Studentify.Models.StudentifyEvents.StudentifyEvent", "ReferencedEvent")
-                        .WithMany()
-                        .HasForeignKey("ReferencedEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Studentify.Models.StudentifyAccount", "UserAccount")
-                        .WithMany()
-                        .HasForeignKey("UserAccountId");
-
-                    b.Navigation("ReferencedEvent");
-
-                    b.Navigation("UserAccount");
-                });
-
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>
                 {
                     b.HasOne("Studentify.Models.Authentication.StudentifyUser", "User")
@@ -546,11 +402,6 @@ namespace Studentify.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Author");
-                });
-
-            modelBuilder.Entity("Studentify.Models.Messages.Thread", b =>
-                {
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Studentify.Models.StudentifyAccount", b =>

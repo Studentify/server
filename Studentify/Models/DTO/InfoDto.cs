@@ -2,7 +2,7 @@
 
 namespace Studentify.Models.HttpBody
 {
-    public class InfoDTO : EventDTO
+    public class InfoDto : StudentifyEventDto
     {
         public InfoCategory Category { get; set; }
     }

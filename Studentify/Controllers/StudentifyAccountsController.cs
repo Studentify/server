@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Studentify.Data;
+using Studentify.Data.Repositories;
 using Studentify.Models;
+using Studentify.Models.HttpBody;
 
 namespace Studentify.Controllers
 {
@@ -12,70 +14,65 @@ namespace Studentify.Controllers
     [ApiController]
     public class StudentifyAccountsController : ControllerBase
     {
-        private readonly StudentifyDbContext _context;
+        private readonly IStudentifyAccountsRepository _accountsRepository;
 
-        public StudentifyAccountsController(StudentifyDbContext context)
+        public StudentifyAccountsController(IStudentifyAccountsRepository accountsRepository)
         {
-            _context = context;
+            _accountsRepository = accountsRepository;
         }
 
         // GET: api/Initials
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentifyAccount>>> GetStudentifyAccounts()
         {
-            StudentifyAccountManager accountManager = new StudentifyAccountManager(_context);
-            var accounts = await accountManager.GetAccountsAsync();
+            var accounts = await _accountsRepository.Select.All();
             return accounts.ToList();
         }
         
         // GET: api/Initials/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<StudentifyAccount>> GetStudentifyAccount(int id)
         {
-            var initial = await _context.StudentifyAccounts.FindAsync(id);
+            var account = await _accountsRepository.Select.ById(id);
 
-            if (initial == null)
+            if (account == null)
             {
                 return NotFound();
             }
 
-            return initial;
+            return account;
         }
 
-        // // PUT: api/Initials/5
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutInitial(int id, Initial initial)
-        // {
-        //     if (id != initial.Id)
-        //     {
-        //         return BadRequest();
-        //     }
-        //
-        //     _context.Entry(initial).State = EntityState.Modified;
-        //
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!InitialExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
-        //
-        //     return NoContent();
-        // }
-        //
-        // private bool InitialExists(int id)
-        // {
-        //     return _context.Initial.Any(e => e.Id == id);
-        // }
+        // PATCH: api/StudentifyAccounts
+        [Authorize]
+        [HttpPatch]
+        public async Task<IActionResult> PutStudentifyAccount(StudentifyAccountDto accountDto)
+        {
+            var username = User.Identity.Name;
+            StudentifyAccount account;
+            
+            try
+            {
+                account = await _accountsRepository.SelectByUsername(username);
+            }
+            catch (DataException)
+            {
+                return BadRequest();
+            }
+
+            account.User.FirstName = accountDto.FirstName;
+            account.User.LastName = accountDto.LastName;
+            
+            try
+            {
+                await _accountsRepository.Update.One(account, account.Id);
+            }
+            catch (DataException)
+            {
+                return NotFound();
+            }
+            
+            return NoContent();
+        }
     }
 }
