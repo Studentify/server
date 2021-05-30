@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Studentify.Data;
+using Microsoft.AspNetCore.Authorization;
 using Studentify.Data.Repositories;
 using Studentify.Models.Authentication;
 using Studentify.Models.HttpBody;
@@ -55,43 +55,45 @@ namespace Studentify.Controllers
             var user = await _userManager.FindByNameAsync(dto.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
+                var token = await GenerateToken(user);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
-
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["JWT:ValidIssuer"],
-                    audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddDays(3),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                    );
-
+                var account = await _accountsRepository.SelectByUsername(dto.Username);
+                
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo,
-                    user = new
-                    {
-                        user.FirstName,
-                        user.LastName,
-                        user.UserName,
-                        user.Email
-                    }
+                    account
                 });
             }
             return Unauthorized();
+        }
+
+        private async Task<JwtSecurityToken> GenerateToken(StudentifyUser user)
+        {
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddDays(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+            return token;
         }
 
         /// <summary>
@@ -136,7 +138,9 @@ namespace Studentify.Controllers
 
             await _accountsRepository.InsertFromStudentifyUser(user);
 
-            return Ok(new AuthResponse { Status = "Success", Message = "User created successfully!" });
+            var token = await GenerateToken(user);
+            
+            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
         }
     }
 }

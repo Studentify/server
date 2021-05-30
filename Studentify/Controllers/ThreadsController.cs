@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
 using Studentify.Models;
@@ -57,8 +55,8 @@ namespace Studentify.Controllers
 
         // POST: api/Threads
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
         [Authorize]
+        [HttpPost]
         public async Task<ActionResult<Thread>> PostThread(int eventId)
         {
             var username = User.Identity.Name;
@@ -125,8 +123,8 @@ namespace Studentify.Controllers
 
         // POST: api/Threads/Messages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("Messages")]
         [Authorize]
+        [HttpPost("Messages")]
         public async Task<ActionResult<Thread>> PostMessage(MessageDto messageDto)
         {
             var username = User.Identity.Name;

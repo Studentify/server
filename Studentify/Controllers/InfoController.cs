@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Studentify.Data;
 using Studentify.Data.Repositories;
-using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
@@ -51,7 +49,8 @@ namespace Studentify.Controllers
 
         // PUT: api/Infos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
+        //[Authorize]
         public async Task<IActionResult> PutInfo(int id, InfoDto infoDto)
         {
             Info info;
@@ -87,6 +86,7 @@ namespace Studentify.Controllers
 
         // POST: api/Infos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Info>> PostInfo(InfoDto infoDto)
         {

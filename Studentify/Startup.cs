@@ -14,9 +14,6 @@ using Microsoft.IdentityModel.Tokens;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Implementations;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
-using Studentify.Models;
-using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
-using Studentify.Data.Repositories.ControllerRepositories.Implementations;
 
 namespace Studentify
 {

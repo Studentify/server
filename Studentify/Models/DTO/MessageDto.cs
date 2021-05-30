@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Studentify.Models.Messages;
-
-namespace Studentify.Models.HttpBody
+﻿namespace Studentify.Models.HttpBody
 {
     public class MessageDto
     {

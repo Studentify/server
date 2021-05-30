@@ -2,9 +2,8 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Models;
 using Studentify.Models.HttpBody;
@@ -31,7 +30,7 @@ namespace Studentify.Controllers
         }
         
         // GET: api/Initials/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<StudentifyAccount>> GetStudentifyAccount(int id)
         {
             var account = await _accountsRepository.Select.ById(id);
@@ -45,6 +44,7 @@ namespace Studentify.Controllers
         }
 
         // PATCH: api/StudentifyAccounts
+        [Authorize]
         [HttpPatch]
         public async Task<IActionResult> PutStudentifyAccount(StudentifyAccountDto accountDto)
         {
@@ -60,10 +60,8 @@ namespace Studentify.Controllers
                 return BadRequest();
             }
 
-            //account.User.UserName = accountDto.UserName;    //todo make changing username work
             account.User.FirstName = accountDto.FirstName;
             account.User.LastName = accountDto.LastName;
-            account.User.Email = accountDto.Email;
             
             try
             {
