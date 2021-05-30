@@ -21,21 +21,23 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
         {
             Insert = insertRepository;
             Update = updateRepository;
-            Select.FillWithReferences += async entities =>
-            {
-                await Context.Entry(entities).Collection(m => m.Participants).LoadAsync();
-                var users = await Context.Set<StudentifyAccount>().ToListAsync();
-                foreach (var user in users)
-                {
-                    await Context.Entry(user).Reference(i => i.User).LoadAsync();
-                }
-            };
         }
 
         public async Task RegisterAttendance(Meeting meeting, StudentifyAccount account)
         {
             meeting.Participants.Add(account);
             await Context.SaveChangesAsync();
+        }
+
+        protected override async Task FillWithReferences(Meeting entities)
+        {
+            await base.FillWithReferences(entities);
+            await Context.Entry(entities).Collection(m => m.Participants).LoadAsync();
+            var users = await Context.Set<StudentifyAccount>().ToListAsync();
+            foreach (var user in users)
+            {
+                await Context.Entry(user).Reference(i => i.User).LoadAsync();
+            }
         }
     }
 }
