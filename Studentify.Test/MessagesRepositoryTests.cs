@@ -33,7 +33,7 @@ namespace Studentify.Test
                                                 new UpdateRepositoryBase<Message>(context));
 
             //Creating one dummy context for all messages
-            _thread = new Thread { EventId = 1 };
+            _thread = new Thread { ReferencedEventId = 1 };
             context.Threads.Add(_thread);
             context.SaveChanges();
         }

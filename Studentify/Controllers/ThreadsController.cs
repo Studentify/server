@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
+using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.Messages;
 using Studentify.Models.StudentifyEvents;
@@ -22,12 +23,14 @@ namespace Studentify.Controllers
         private readonly IThreadsRepository _threadsRepository;
         private readonly IMessagesRepository _messagesRepository;
         private readonly IStudentifyAccountsRepository _accountsRepository;
+        private readonly IStudentifyEventsRepository _eventsRepository;
 
-        public ThreadsController(IThreadsRepository threadsRepository, IMessagesRepository messagesRepository, IStudentifyAccountsRepository accountsRepository)
+        public ThreadsController(IThreadsRepository threadsRepository, IMessagesRepository messagesRepository, IStudentifyAccountsRepository accountsRepository, IStudentifyEventsRepository studentifyEventsRepository)
         {
             _threadsRepository = threadsRepository;
             _accountsRepository = accountsRepository;
             _messagesRepository = messagesRepository;
+            _eventsRepository = studentifyEventsRepository;
         }
 
         // GET: api/Threads
@@ -59,11 +62,29 @@ namespace Studentify.Controllers
         public async Task<ActionResult<Thread>> PostThread(int eventId)
         {
             var username = User.Identity.Name;
-            var account = await _accountsRepository.SelectByUsername(username);
+            StudentifyAccount account;
+            try
+            {
+                account = await _accountsRepository.SelectByUsername(username);
+            }
+            catch (DataException)
+            {
+                return BadRequest($"Cannot get id of logged account.");
+            }
+
+            StudentifyEvent referencedEvent;
+            try
+            {
+                referencedEvent = await _eventsRepository.Select.ById(eventId);
+            }
+            catch (DataException)
+            {
+                return NotFound($"Event of id {eventId} not found.");
+            }
 
             var thread = new Thread()
             {
-                EventId = eventId,
+                ReferencedEvent = referencedEvent,
                 UserAccount = account
             };
 

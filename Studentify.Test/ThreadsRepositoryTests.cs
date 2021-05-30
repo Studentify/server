@@ -37,7 +37,7 @@ namespace Studentify.Test
         {
             Thread thread = new Thread()
             {
-                EventId = 1,
+                ReferencedEventId = 1,
             };
 
             await _repository.Insert.One(thread);
@@ -51,7 +51,7 @@ namespace Studentify.Test
         {
             Thread insertedThread = new Thread()
             {
-                EventId = 1,
+                ReferencedEventId = 1,
             };
 
             await _repository.Insert.One(insertedThread);
