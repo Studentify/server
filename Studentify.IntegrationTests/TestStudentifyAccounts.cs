@@ -104,7 +104,7 @@ namespace Studentify.IntegrationTests
             {
                 Username = _testUser.Username,
                 Password = _testUser.Password,
-                Email = "patch" + _testUser.Email,
+                Email = _testUser.Email,
                 FirstName = "patch" + _testUser.FirstName,
                 LastName = "patch" + _testUser.LastName
             };
