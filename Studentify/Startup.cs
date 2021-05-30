@@ -15,6 +15,8 @@ using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Implementations;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
 using Studentify.Models;
+using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
+using Studentify.Data.Repositories.ControllerRepositories.Implementations;
 
 namespace Studentify
 {
@@ -44,11 +46,18 @@ namespace Studentify
                 .AddScoped(typeof(IInsertRepository<>), typeof(InsertRepositoryBase<>))
                 .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
+
+                .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>()
+
+                .AddScoped<IThreadsRepository, ThreadsRepository>()
+                .AddScoped<IMessagesRepository, MessagesRepository>()
+
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>()
                 .AddScoped<ITradeOffersRepository, TradeOffersRepository>()
-                .AddScoped<IMeetingsRepository, MeetingsRepository>()
-                .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>();
+                .AddScoped<IMeetingsRepository, MeetingsRepository>();
+                
+
 
             services.AddCors(options =>
             {
