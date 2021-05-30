@@ -41,7 +41,7 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
             };
         }
 
-        public async Task PostNewMessage(Thread thread, Message message)
+        public async Task InsertMessageToThread(Message message, Thread thread)
         {
             await Context.Messages.AddAsync(message);
             thread.Messages.Add(message);

@@ -11,7 +11,7 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Interfaces
         public ISelectRepository<Message> Select { get; }
         public IInsertRepository<Message> Insert { get; }
         public IUpdateRepository<Message> Update { get; }
-        public Task PostNewMessage(Thread thread, Message message);
+        public Task InsertMessageToThread(Message message, Thread thread);
         public Task<IEnumerable<Message>> SelectAllFromThread(int threadId);
     }
 }

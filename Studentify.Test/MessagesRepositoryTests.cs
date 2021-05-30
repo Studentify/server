@@ -50,7 +50,7 @@ namespace Studentify.Test
                 Thread = _thread
             };
 
-            await _repository.PostNewMessage(_thread, message);
+            await _repository.InsertMessageToThread(message, _thread);
             var messages = await _repository.Select.All();
 
             Assert.True(messages.Contains(message));

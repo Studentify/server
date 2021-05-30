@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -79,16 +80,16 @@ namespace Studentify.Controllers
             return messages.ToList();
         }
 
-        // GET: api/Threads/Messages/5
-        [HttpGet("Messages/{threadId}")]
-        public async Task<ActionResult<IEnumerable<Message>>> GetMessages(int threadId)
+        // GET: api/Threads/5/Messages
+        [HttpGet("{threadId:int}/Messages")]
+        public async Task<ActionResult<IEnumerable<Message>>> GetMessagesFromThread(int threadId)
         {
             var messages = await _messagesRepository.SelectAllFromThread(threadId);
             return messages.ToList();
         }
 
-        // GET: api/Threads/Message/5
-        [HttpGet("Message/{id}")]
+        // GET: api/Threads/Messages/5
+        [HttpGet("Messages/{id:int}")]
         public async Task<ActionResult<Message>> GetMessage(int id)
         {
             var message = await _messagesRepository.Select.ById(id);
@@ -110,22 +111,26 @@ namespace Studentify.Controllers
             var username = User.Identity.Name;
             var account = await _accountsRepository.SelectByUsername(username);
 
-            //await _context.Threads.Include(t => t.Messages).LoadAsync();
-            //var thread = await _context.Threads.FindAsync(messageDto.ThreadId);
-            var thread = await _threadsRepository.Select.ById(messageDto.ThreadId);
-
-            var message = new Message()
+            try
             {
-                Author = account,
-                Date = DateTime.Now,
-                Content = messageDto.Content,
-                IsViewed = false,
-                Thread = thread
-            };
+                var thread = await _threadsRepository.Select.ById(messageDto.ThreadId);
+                var message = new Message()
+                {
+                    Author = account,
+                    Date = DateTime.Now,
+                    Content = messageDto.Content,
+                    IsViewed = false,
+                    Thread = thread
+                };
 
-            await _messagesRepository.PostNewMessage(thread, message);
-
-            return CreatedAtAction(nameof(GetMessage), new { id = message.Id }, message);
+                await _messagesRepository.InsertMessageToThread(message, thread);
+                
+                return CreatedAtAction(nameof(GetMessage), new { id = message.Id }, message);
+            }
+            catch (DataException)
+            {
+                return NotFound($"Thread of id {messageDto.ThreadId} not found.");
+            }
         }
     }
 }
