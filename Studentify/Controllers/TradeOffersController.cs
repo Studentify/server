@@ -68,6 +68,20 @@ namespace Studentify.Controllers
                 return BadRequest();
             }
             
+            StudentifyAccount buyerAccount = null;
+            if (tradeOfferDto.BuyerId.HasValue)
+            {
+                var buyerId = tradeOfferDto.BuyerId.Value;
+                
+                try
+                {
+                    buyerAccount = await _accountsRepository.Select.ById(buyerId);
+                }
+                catch (DataException)
+                {
+                    return NotFound("Buyer id not found");
+                }
+            }
 
             tradeOffer.Name = tradeOfferDto.Name;
             tradeOffer.ExpiryDate = tradeOfferDto.ExpiryDate;
@@ -77,7 +91,7 @@ namespace Studentify.Controllers
             tradeOffer.Description = tradeOfferDto.Description;
             tradeOffer.Offer = tradeOfferDto.Offer;
             tradeOffer.Price = tradeOfferDto.Price;
-            tradeOffer.BuyerId = tradeOfferDto.BuyerId;
+            tradeOffer.Buyer = buyerAccount;
 
             try
             {
@@ -99,6 +113,21 @@ namespace Studentify.Controllers
             var username = User.Identity.Name;
             var account = await _accountsRepository.SelectByUsername(username);
 
+            StudentifyAccount buyerAccount = null;
+            if (tradeOfferDto.BuyerId.HasValue)
+            {
+                var buyerId = tradeOfferDto.BuyerId.Value;
+                
+                try
+                {
+                    buyerAccount = await _accountsRepository.Select.ById(buyerId);
+                }
+                catch (DataException)
+                {
+                    return NotFound("Buyer id not found");
+                }
+            }
+            
             var tradeOffer = new TradeOffer
             {
                 Name = tradeOfferDto.Name,
@@ -110,15 +139,14 @@ namespace Studentify.Controllers
                 CreationDate = DateTime.Now,
                 Offer = tradeOfferDto.Offer,
                 Price = tradeOfferDto.Price,
-                BuyerId = tradeOfferDto.BuyerId     //todo add checking if this id is correct, maybe through reference
+                Buyer = buyerAccount
             };
             
             await _tradeOffersRepository.Insert.One(tradeOffer);
 
             return CreatedAtAction(nameof(GetTradeOffer), new {id = tradeOffer.Id}, tradeOffer);
         }
-
-
+        
         // Patch: api/TradeOffers/5/accept
         [HttpPatch("{id:int}/accept")]
         public async Task<IActionResult> AcceptTradeOffer(int id)

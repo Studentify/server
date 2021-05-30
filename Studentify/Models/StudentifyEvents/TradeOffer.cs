@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Studentify.Models.StudentifyEvents
 {
@@ -6,7 +7,8 @@ namespace Studentify.Models.StudentifyEvents
     {
         [Required] public string Price { get; set; }
         [Required] public string Offer { get; set; }
-        
+
+        [JsonIgnore] public StudentifyAccount Buyer { get; set; }
         public int? BuyerId { get; set; }
     }
 
