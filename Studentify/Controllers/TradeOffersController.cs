@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -107,6 +108,7 @@ namespace Studentify.Controllers
 
         // POST: api/TradeOffers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<TradeOffer>> PostTradeOffer(TradeOfferDto tradeOfferDto)
         {
@@ -148,6 +150,7 @@ namespace Studentify.Controllers
         }
         
         // Patch: api/TradeOffers/5/accept
+        [Authorize]
         [HttpPatch("{id:int}/accept")]
         public async Task<IActionResult> AcceptTradeOffer(int id)
         {

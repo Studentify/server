@@ -111,7 +111,6 @@ namespace Studentify.IntegrationTests
 
             var patchedUserDto = new StudentifyAccountDto()
             {
-                Email = patchedUser.Email,
                 FirstName = patchedUser.FirstName,
                 LastName = patchedUser.LastName
             };

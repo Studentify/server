@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Models.Authentication;
@@ -48,6 +49,7 @@ namespace Studentify.Controllers
         /// In case of success returns code 200 with JWT token.
         /// Otherwise returns http code 401 Unauthorized.
         /// </returns>
+        [Authorize]
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -112,6 +114,7 @@ namespace Studentify.Controllers
         /// In case of success returns code 200.
         /// Otherwise returns code 500 with an error description.
         /// </returns>
+        [Authorize]
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)

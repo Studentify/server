@@ -125,8 +125,8 @@ namespace Studentify.Controllers
 
         // POST: api/Meetings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
         [Authorize]
+        [HttpPost]
         public async Task<ActionResult<Meeting>> PostMeeting(MeetingDto meetingDto)
         {
             var username = User.Identity.Name;
