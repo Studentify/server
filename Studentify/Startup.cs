@@ -46,13 +46,18 @@ namespace Studentify
                 .AddScoped(typeof(IInsertRepository<>), typeof(InsertRepositoryBase<>))
                 .AddScoped(typeof(IDeleteRepository<>), typeof(DeleteRepositoryBase<>))
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
+
+                .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>()
+
+                .AddScoped<IThreadsRepository, ThreadsRepository>()
+                .AddScoped<IMessagesRepository, MessagesRepository>()
+
                 .AddScoped<IStudentifyEventsRepository, StudentifyEventsRepository>()
                 .AddScoped<IInfosRepository, InfosRepository>()
-                .AddScoped<IThreadsRepository, ThreadsRepository>()
-                .AddScoped<IMessagesRepository, MessagesRepository>();
                 .AddScoped<ITradeOffersRepository, TradeOffersRepository>()
-                .AddScoped<IMeetingsRepository, MeetingsRepository>()
-                .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>();
+                .AddScoped<IMeetingsRepository, MeetingsRepository>();
+                
+
 
             services.AddCors(options =>
             {
