@@ -354,6 +354,7 @@ namespace Studentify.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("TradeOffer");
+                });    
                     
             modelBuilder.Entity("Studentify.Models.StudentifyEvents.Meeting", b =>
                 {
