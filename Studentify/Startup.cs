@@ -65,7 +65,7 @@ namespace Studentify
                     });
             });
             
-            services.AddIdentity<StudentifyUser, IdentityRole>()
+            services.AddIdentity<StudentifyUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<StudentifyDbContext>()
                 .AddDefaultTokenProviders();
 
