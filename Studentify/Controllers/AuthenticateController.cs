@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Studentify.Data.Repositories;
+using Studentify.Models;
 using Studentify.Models.Authentication;
 using Studentify.Models.HttpBody;
 
@@ -59,7 +60,6 @@ namespace Studentify.Controllers
             var account = await _accountsRepository.SelectByUsername(dto.Username);
             return Ok(new
             {
-                
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo,
                 account
@@ -104,11 +104,17 @@ namespace Studentify.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, errors);
             }
 
-            await _accountsRepository.InsertFromStudentifyUser(user);
+            var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _accountsRepository.Insert.One(account);
 
             var token = await GenerateToken(user);
             
-            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo,
+                account
+            });
         }
         
         private async Task<JwtSecurityToken> GenerateToken(StudentifyUser user)

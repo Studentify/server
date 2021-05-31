@@ -9,7 +9,7 @@ namespace Studentify.Data.Repositories
     {
         public ISelectRepository<StudentifyAccount> Select { get; set; }
         public IUpdateRepository<StudentifyAccount> Update { get; set; }
-        private IInsertRepository<StudentifyAccount> _insert;
+        public IInsertRepository<StudentifyAccount> Insert { get; set; }
 
         public StudentifyAccountsRepository(StudentifyDbContext context,
             ISelectRepository<StudentifyAccount> selectRepository,
@@ -22,7 +22,7 @@ namespace Studentify.Data.Repositories
             {
                 await Context.Entry(entities).Reference(i => i.User).LoadAsync();
             };
-            _insert = insertRepository;
+            Insert = insertRepository;
         }
 
         public async Task<StudentifyAccount> SelectByUsername(string username)
@@ -31,10 +31,10 @@ namespace Studentify.Data.Repositories
             return accounts.FirstOrDefault(a => a.User.UserName == username);
         }
 
-        public async Task InsertFromStudentifyUser(StudentifyUser user)
-        {
-            var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
-            await _insert.One(account);
-        }
+        // public async Task InsertFromStudentifyUser(StudentifyUser user)
+        // {
+        //     // var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+        //     await Insert.One(account);
+        // }
     }
 }

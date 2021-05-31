@@ -38,7 +38,8 @@ namespace Studentify.Test
                 UserName = "test-user",
             };
 
-            await _accountsRepository.InsertFromStudentifyUser(user);
+            var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _accountsRepository.Insert.One(account);
 
             var accounts = (await _accountsRepository.Select.All())
                 .Where(acc => acc.StudentifyUserId == user.Id).ToList();
