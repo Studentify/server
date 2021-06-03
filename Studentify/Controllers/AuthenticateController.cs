@@ -139,8 +139,11 @@ namespace Studentify.Controllers
             await _accountsRepository.InsertFromStudentifyUser(user);
 
             var token = await GenerateToken(user);
+			var account = await _accountsRepository.SelectByUsername(dto.Username);
             
-            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
+            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo,
+                    account});
         }
     }
 }
