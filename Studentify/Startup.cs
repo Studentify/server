@@ -45,6 +45,7 @@ namespace Studentify
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
 
                 .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>()
+                .AddScoped<ISkillsRepository, SkillsRepository>()
 
                 .AddScoped<IThreadsRepository, ThreadsRepository>()
                 .AddScoped<IMessagesRepository, MessagesRepository>()
