@@ -79,5 +79,46 @@ namespace Studentify.IntegrationTests
             var info = (from i in infos where i == _testInfoGetDto select i).FirstOrDefault();
             Assert.IsNotNull(info);
         }
+
+        [Test]
+        [Order(2)]
+        public async Task TestGetInfoById()
+        {
+            var uri = string.Format("/api/Info/{0}", _testInfoGetDto.Id);
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Get, uri);
+            response.EnsureSuccessStatusCode();
+            var receivedInfo = await Utilities.Deserialize<InfoGetDto>(response);
+            Assert.True(_testInfoGetDto == receivedInfo);
+        }
+
+        [Test]
+        [Order(3)]
+        public async Task TestPatchInfoById()
+        {
+            _testInfo.Name = "patch_" + _testInfo.Name;
+            _testInfo.ExpiryDate = _testInfo.ExpiryDate.AddDays(2);
+            _testInfo.Description = "Juz nie alarm.";
+            _testInfo.Longitude -= 1;
+            _testInfo.Latitude += 1.5;
+            _testInfo.Address = new()
+            {
+                Country = "Niemcy",
+                Town = "Berlin",
+                PostalCode = "00-000",
+                Street = "Geschlechtsverkehrstrasse",
+                HouseNumber = "18"
+            };
+            _testInfo.Category = InfoCategory.Notice;
+
+            var uri = string.Format("/api/Info/{0}", _testInfoGetDto.Id);
+            var response = await Utilities.SendAuthorizedRequest(_client, _loginData, HttpMethod.Patch, uri, _testInfo);
+            response.EnsureSuccessStatusCode();
+
+            var getUri = string.Format("/api/Info/{0}", _testInfoGetDto.Id);
+            var getResponse = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Get, getUri);
+            response.EnsureSuccessStatusCode();
+            var receivedInfo = await Utilities.Deserialize<InfoGetDto>(getResponse);
+            Assert.True(receivedInfo == _testInfo);
+        }
     }
 }
