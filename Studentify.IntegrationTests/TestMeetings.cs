@@ -58,105 +58,31 @@ namespace Studentify.IntegrationTests
         public async Task PrepareAccountAndClient()
         {
             _client = _factory.CreateClient();
-            await Register(_testUser);
-            await Register(_testAttendant);
-            _loginData = await Login(new LoginDto
+            await Utilities.Register(_client, _testUser);
+            await Utilities.Register(_client, _testAttendant);
+            _loginData = await Utilities.Login(_client, new LoginDto
             {
                 Username = _testUser.Username,
                 Password = _testUser.Password
             });
         }
 
-        public async Task Register(RegisterDto user)
-        {
-            using var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("api/authenticate/register", UriKind.Relative),
-                Content = new StringContent(
-                    JsonSerializer.Serialize(user),
-                    Encoding.UTF8,
-                    MediaTypeNames.Application.Json)
-            };
-
-            var response = await _client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-        }
-
-        private async Task<LoginGetDto> Login(LoginDto user)
-        {
-            using var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("api/authenticate/login", UriKind.Relative),
-                Content = new StringContent(
-                    JsonSerializer.Serialize(user),
-                    Encoding.UTF8,
-                    MediaTypeNames.Application.Json)
-            };
-
-            var response = await _client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<LoginGetDto>(
-                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-        }
-       
-        private async Task<HttpResponseMessage> SendAuthorizedRequest<DtoType>(HttpMethod method, string uri, DtoType dto)
-        {
-            using var request = new HttpRequestMessage
-            {
-                Method = method,
-                RequestUri = new Uri(uri, UriKind.Relative),
-                Content = new StringContent(JsonSerializer.Serialize(dto),
-                                            Encoding.UTF8,
-                                            MediaTypeNames.Application.Json)
-            };
-            request.Headers.Add("Authorization", "Bearer " + _loginData.Token);
-            return await _client.SendAsync(request);
-        }
-
-        private async Task<HttpResponseMessage> SendAuthorisedNoBodyRequest(HttpMethod method, string uri)
-        {
-            using var request = new HttpRequestMessage
-            {
-                Method = method,
-                RequestUri = new Uri(uri, UriKind.Relative)
-            };
-            request.Headers.Add("Authorization", "Bearer " + _loginData.Token);
-            return await _client.SendAsync(request);
-        }
-
-        private async Task<MeetingGetDto> Deserialize(HttpResponseMessage response)
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<MeetingGetDto>(
-                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-        }
-
-        private async Task<List<MeetingGetDto>> DeserializeList(HttpResponseMessage response)
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<MeetingGetDto>>(
-                body, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-        }
-
         [Test]
         [Order(1)]
         public async Task TestPostMeeting()
         {
-            var response = await SendAuthorizedRequest(HttpMethod.Post, "/api/Meetings", _testMeeting);
+            var response = await Utilities.SendAuthorizedRequest(_client, _loginData, HttpMethod.Post, "/api/Meetings", _testMeeting);
             response.EnsureSuccessStatusCode();
-            _testMeetingGetGto = await Deserialize(response);
+            _testMeetingGetGto = await Utilities.Deserialize<MeetingGetDto>(response);
         }
 
         [Test]
         [Order(2)]
         public async Task TestGetMeetings()
         {
-            var response = await SendAuthorisedNoBodyRequest(HttpMethod.Get, "/api/Meetings/");
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Get, "/api/Meetings/");
             response.EnsureSuccessStatusCode();
-            var meetings = await DeserializeList(response);
+            var meetings = await Utilities.Deserialize<List<MeetingGetDto>>(response);
             var meeting = (from m in meetings where m == _testMeetingGetGto select m).FirstOrDefault();
             Assert.IsNotNull(meeting);
         }
@@ -166,9 +92,9 @@ namespace Studentify.IntegrationTests
         public async Task TestGetMeetingById()
         {
             var uri = string.Format("/api/Meetings/{0}", _testMeetingGetGto.Id);
-            var response = await SendAuthorisedNoBodyRequest(HttpMethod.Get, uri);
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Get, uri);
             response.EnsureSuccessStatusCode();
-            var receivedMeeting = await Deserialize(response);
+            var receivedMeeting = await Utilities.Deserialize<MeetingGetDto>(response);
             Assert.True(_testMeetingGetGto == receivedMeeting);
         }
 
@@ -192,13 +118,13 @@ namespace Studentify.IntegrationTests
             _testMeeting.MaxNumberOfParticipants += 1;
 
             var uri = string.Format("/api/Meetings/{0}", _testMeetingGetGto.Id);
-            var response = await SendAuthorizedRequest(HttpMethod.Patch, uri, _testMeeting);
+            var response = await Utilities.SendAuthorizedRequest(_client, _loginData, HttpMethod.Patch, uri, _testMeeting);
             response.EnsureSuccessStatusCode();
 
             var getUri = string.Format("/api/Meetings/{0}", _testMeetingGetGto.Id);
-            var getResponse = await SendAuthorisedNoBodyRequest(HttpMethod.Get, getUri);
+            var getResponse = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Get, getUri);
             response.EnsureSuccessStatusCode();
-            var receivedMeeting = await Deserialize(getResponse);
+            var receivedMeeting = await Utilities.Deserialize<MeetingGetDto>(getResponse);
             Assert.True(receivedMeeting == _testMeeting);
         }
 
@@ -207,7 +133,7 @@ namespace Studentify.IntegrationTests
         public async Task FailToAddOwnerAsAttendant()
         {
             var uri = string.Format("/api/Meetings/attend/{0}", _testMeetingGetGto.Id);
-            var response = await SendAuthorisedNoBodyRequest(HttpMethod.Patch, uri);
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Patch, uri);
             try
             {
                 response.EnsureSuccessStatusCode();
@@ -227,14 +153,14 @@ namespace Studentify.IntegrationTests
             var ownerLoginData = _loginData;
 
             _client = _factory.CreateClient();
-            _loginData = await Login(new LoginDto
+            _loginData = await Utilities.Login(_client, new LoginDto
             {
                 Username = _testAttendant.Username,
                 Password = _testAttendant.Password
             });
 
             var uri = string.Format("/api/Meetings/attend/{0}", _testMeetingGetGto.Id);
-            var response = await SendAuthorisedNoBodyRequest(HttpMethod.Patch, uri);
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Patch, uri);
             response.EnsureSuccessStatusCode();
 
             _client = ownerClient;
@@ -249,14 +175,14 @@ namespace Studentify.IntegrationTests
             var ownerLoginData = _loginData;
 
             _client = _factory.CreateClient();
-            _loginData = await Login(new LoginDto
+            _loginData = await Utilities.Login(_client, new LoginDto
             {
                 Username = _testAttendant.Username,
                 Password = _testAttendant.Password
             });
 
             var uri = string.Format("/api/Meetings/attend/{0}", _testMeetingGetGto.Id);
-            var response = await SendAuthorisedNoBodyRequest(HttpMethod.Patch, uri);
+            var response = await Utilities.SendAuthorisedNoBodyRequest(_client, _loginData, HttpMethod.Patch, uri);
             try
             {
                 response.EnsureSuccessStatusCode();
