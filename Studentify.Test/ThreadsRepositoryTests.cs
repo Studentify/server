@@ -56,5 +56,38 @@ namespace Studentify.Test
 
             Assert.AreEqual(insertedThread, selectedThread);
         }
+
+        [Test]
+        public async Task TestSelectAllThreads()
+        {
+            Thread insertedThread = new Thread()
+            {
+                ReferencedEventId = 1,
+            };
+
+            await _repository.Insert.One(insertedThread);
+            var threads = await _repository.Select.All();
+
+            Assert.True(threads.Any());
+        }
+
+        [Test]
+        public async Task TestUpdateOneThread()
+        {
+            const int newEventId = 2;
+
+            Thread insertedThread = new Thread()
+            {
+                ReferencedEventId = 1,
+            };
+
+            await _repository.Insert.One(insertedThread);
+
+            insertedThread.ReferencedEventId = newEventId;
+            await _repository.Update.One(insertedThread, insertedThread.Id);
+            var selectedThread = await _repository.Select.ById(insertedThread.Id);
+
+            Assert.AreEqual(newEventId, selectedThread.ReferencedEventId);
+        }
     }
 }
