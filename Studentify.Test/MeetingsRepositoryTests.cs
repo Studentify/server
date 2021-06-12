@@ -40,7 +40,7 @@ namespace Studentify.Test
             {
                 AuthorId = 1,
                 Address = null,
-                Name = "Testowe spotkanie",
+                Name = "Testowe spotkanie insert",
                 CreationDate = DateTime.Now,
                 ExpiryDate = DateTime.Now,
                 MaxNumberOfParticipants = 1
@@ -50,6 +50,76 @@ namespace Studentify.Test
             var meetings = await _repository.Select.All();
 
             Assert.True(meetings.Contains(meeting));
+        }
+
+        [Test]
+        public async Task TestGetOneMeeting()
+        {
+            Meeting meeting = new Meeting()
+            {
+                AuthorId = 1,
+                Address = null,
+                Name = "Testowe spotkanie get one",
+                CreationDate = DateTime.Now,
+                ExpiryDate = DateTime.Now,
+                MaxNumberOfParticipants = 1
+            };
+
+            await _repository.Insert.One(meeting);
+            var selectedMeeting = await _repository.Select.ById(meeting.Id);
+
+            Assert.AreEqual(meeting.Name, selectedMeeting.Name);
+        }
+
+        [Test]
+        public async Task TestGetAllMeetings()
+        {
+            Meeting meeting = new Meeting()
+            {
+                AuthorId = 1,
+                Address = null,
+                Name = "Testowe spotkanie get all",
+                CreationDate = DateTime.Now,
+                ExpiryDate = DateTime.Now,
+                MaxNumberOfParticipants = 1
+            };
+
+            await _repository.Insert.One(meeting);
+            var meetings = await _repository.Select.All();
+
+            Assert.True(meetings.ToList().Count > 0);
+        }
+
+        [Test]
+        public async Task TestUpdateOneMeeting()
+        {
+            const string newMeetingName = "Nowe testowe spotkanie";
+
+            Meeting meeting = new Meeting()
+            {
+                AuthorId = 1,
+                Address = null,
+                Name = "Testowe spotkanie insert",
+                CreationDate = DateTime.Now,
+                ExpiryDate = DateTime.Now,
+                MaxNumberOfParticipants = 1
+            };
+
+            await _repository.Insert.One(meeting);
+
+            meeting.Name = newMeetingName;
+            await _repository.Update.One(meeting, meeting.Id);
+            var updatedMeeting = await _repository.Select.ById(meeting.Id);
+
+            Assert.AreEqual(newMeetingName, updatedMeeting.Name);
+        }
+
+        [Test]
+        public async Task TestGetNoMeetings()
+        {
+            var meetings = await _repository.Select.All();
+
+            Assert.False(meetings.Where(m => m.Name == "There is no meeting").Any());
         }
 
         [Test]
