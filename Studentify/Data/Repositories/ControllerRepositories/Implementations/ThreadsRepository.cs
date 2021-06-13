@@ -2,6 +2,10 @@
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
 using Studentify.Models;
 using Studentify.Models.Messages;
+using Studentify.Models.StudentifyEvents;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
 {
@@ -28,7 +32,16 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
                 {
                     await Context.Entry(user).Reference(i => i.User).LoadAsync();
                 }
+                await Context.Entry(entities).Reference(t => t.ReferencedEvent).LoadAsync();
+                await Context.Entry(entities).Collection(t => t.Messages).LoadAsync();
             };
+        }
+
+        public async Task<IEnumerable<Thread>> SelectAllUserRelatedThreads(string username)
+        {
+            var threads = await Select.All();
+
+            return threads.Where(t => ((t.UserAccount.UserName == username) || (t.ReferencedEvent.Author.UserName == username)));
         }
     }
 }
