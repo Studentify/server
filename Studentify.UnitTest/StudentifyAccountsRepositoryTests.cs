@@ -10,7 +10,7 @@ using Studentify.Models.Authentication;
 
 namespace Studentify.Test
 {
-    [TestFixture]
+    [TestFixture, Order(0)]
     class StudentifyAccountsRepositoryTests
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
@@ -58,22 +58,16 @@ namespace Studentify.Test
 
         [Test]
         public async Task TestSelectByUsername()
-        {
-            await using var context = new StudentifyDbContext(_dbContextOptions);
-            var repository = new StudentifyAccountsRepository(context,
-                new SelectRepositoryBase<StudentifyAccount>(context),
-                new UpdateRepositoryBase<StudentifyAccount>(context),
-                new InsertRepositoryBase<StudentifyAccount>(context));
-            
+        {       
             StudentifyUser user = new StudentifyUser()
             {
                 UserName = "test-user",
             };
 
             var addedAccount = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
-            await repository.Insert.One(addedAccount);
+            await _repository.Insert.One(addedAccount);
 
-            var account = await repository.SelectByUsername("test-user");
+            var account = await _repository.SelectByUsername("test-user");
 
             Assert.IsTrue(account != null);
         }
