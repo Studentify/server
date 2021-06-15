@@ -12,6 +12,7 @@ using Studentify.Models.DTO;
 using Studentify.Models.HttpBody;
 using Studentify.Models.Messages;
 using Studentify.Models.StudentifyEvents;
+using Microsoft.AspNetCore.Http;
 
 namespace Studentify.Controllers
 {
@@ -57,6 +58,13 @@ namespace Studentify.Controllers
         public async Task<ActionResult<Skill>> PostSkill(SkillDto skillDto)
         {
             var account = await _accountsRepository.Select.ById(skillDto.OwnerId);
+
+            var loggedName = User.Identity.Name;
+            var loggedId = (await _accountsRepository.SelectByUsername(loggedName)).Id;
+            if (loggedId == skillDto.OwnerId)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, $"Adding a skill to self is not allowed.");
+            }
 
             var skill = new Skill()
             {
