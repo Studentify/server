@@ -17,6 +17,7 @@ namespace Studentify.Test
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
         private SkillsRepository _repository;
+        private StudentifyDbContext _context;
 
         [OneTimeSetUp]
         public void Setup()
@@ -25,11 +26,17 @@ namespace Studentify.Test
                 .UseInMemoryDatabase(databaseName: "StudentifyDb")
                 .Options;
 
-            StudentifyDbContext context = new StudentifyDbContext(_dbContextOptions);
-            _repository = new SkillsRepository(context,
-                                               new SelectRepositoryBase<Skill>(context),
-                                               new InsertRepositoryBase<Skill>(context),
-                                               new UpdateRepositoryBase<Skill>(context));
+            _context = new StudentifyDbContext(_dbContextOptions);
+            _repository = new SkillsRepository(_context,
+                                               new SelectRepositoryBase<Skill>(_context),
+                                               new InsertRepositoryBase<Skill>(_context),
+                                               new UpdateRepositoryBase<Skill>(_context));
+        }
+        
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
         }
 
         [Test]

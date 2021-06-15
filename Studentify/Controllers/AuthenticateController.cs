@@ -9,15 +9,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Studentify.Data.Repositories;
+using Studentify.Models;
 using Studentify.Models.Authentication;
 using Studentify.Models.HttpBody;
 
 namespace Studentify.Controllers
 {
     /// <summary>
-    /// Controller responsible for loging and registering user.
+    /// Controller responsible for logging and registering user.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
@@ -53,22 +53,70 @@ namespace Studentify.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _userManager.FindByNameAsync(dto.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password)) 
+                return Unauthorized();
+            
+            var token = await GenerateToken(user);
+            var account = await _accountsRepository.SelectByUsername(dto.Username);
+            return Ok(new
             {
-                var token = await GenerateToken(user);
-
-                var account = await _accountsRepository.SelectByUsername(dto.Username);
-                
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                    account
-                });
-            }
-            return Unauthorized();
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo,
+                account
+            });
         }
+        
+        /// <summary>
+        /// Register user in database with Studentify.Models.Authentication.RegisterModel
+        /// and creates StudentifyAccount for him.
+        /// </summary>
+        /// <param name="dto">
+        /// New user's credentials eg.
+        /// {
+        ///     "Username": "user",
+        ///     "Email": "email@test.com"
+        ///     "Password": "password"
+        /// }
+        /// Password have to contain one uppercase letter,
+        /// one digit and one non alphanumeric character
+        /// </param>
+        /// <returns>
+        /// In case of success returns code 200.
+        /// Otherwise returns code 500 with an error description.
+        /// </returns>
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        {
+            var user = new StudentifyUser()
+            {
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = dto.Username
+            };
+            var result = await _userManager.CreateAsync(user, dto.Password);
 
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors;
+                return StatusCode(StatusCodes.Status500InternalServerError, errors);
+            }
+
+            var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _accountsRepository.Insert.One(account);
+
+            var token = await GenerateToken(user);
+            
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo,
+                account
+            });
+        }
+        
         private async Task<JwtSecurityToken> GenerateToken(StudentifyUser user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -94,53 +142,6 @@ namespace Studentify.Controllers
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
             return token;
-        }
-
-        /// <summary>
-        /// Register user in database with Studentify.Models.Authentication.RegisterModel
-        /// and creates StudentifyAccount for him.
-        /// </summary>
-        /// <param name="dto">
-        /// New user's credentials eg.
-        /// {
-        ///     "Username": "user",
-        ///     "Email": "email@test.com"
-        ///     "Password": "password"
-        /// }
-        /// Password have to contain one uppercase letter,
-        /// one digit and one non alphanumeric character
-        /// </param>
-        /// <returns>
-        /// In case of success returns code 200.
-        /// Otherwise returns code 500 with an error description.
-        /// </returns>
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-        {
-            var userExists = await _userManager.FindByNameAsync(dto.Username);
-            var emailExists = await _userManager.FindByEmailAsync(dto.Email);
-            if (userExists != null || emailExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponse { Status = "Error", Message = "User already exists!" });
-
-            StudentifyUser user = new StudentifyUser()
-            {
-                Email = dto.Email,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = dto.Username
-            };
-            var result = await _userManager.CreateAsync(user, dto.Password);
-
-            if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponse { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-
-            await _accountsRepository.InsertFromStudentifyUser(user);
-
-            var token = await GenerateToken(user);
-            
-            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
         }
     }
 }

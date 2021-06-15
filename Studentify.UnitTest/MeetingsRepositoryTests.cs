@@ -18,6 +18,7 @@ namespace Studentify.Test
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
         private MeetingsRepository _repository;
+        private StudentifyDbContext _context;
 
         [OneTimeSetUp]
         public void Setup()
@@ -26,11 +27,17 @@ namespace Studentify.Test
                 .UseInMemoryDatabase(databaseName: "StudentifyDb")
                 .Options;
 
-            StudentifyDbContext context = new StudentifyDbContext(_dbContextOptions);
-            _repository = new MeetingsRepository(context,
-                                                 new SelectRepositoryBase<Meeting>(context),
-                                                 new InsertRepositoryBase<Meeting>(context),
-                                                 new UpdateRepositoryBase<Meeting>(context));
+            _context = new StudentifyDbContext(_dbContextOptions);
+            _repository = new MeetingsRepository(_context,
+                                                 new SelectRepositoryBase<Meeting>(_context),
+                                                 new InsertRepositoryBase<Meeting>(_context),
+                                                 new UpdateRepositoryBase<Meeting>(_context));
+        }
+        
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
         }
 
         [Test]

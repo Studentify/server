@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -9,11 +10,12 @@ using Studentify.Models.Authentication;
 
 namespace Studentify.Test
 {
-    [TestFixture]
+    [TestFixture, Order(0)]
     class StudentifyAccountsRepositoryTests
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
         private StudentifyAccountsRepository _repository;
+        private StudentifyDbContext _context;
 
         [OneTimeSetUp]
         public void Setup()
@@ -22,11 +24,17 @@ namespace Studentify.Test
                 .UseInMemoryDatabase(databaseName: "StudentifyDb")
                 .Options;
 
-            var context = new StudentifyDbContext(_dbContextOptions);
-            _repository = new StudentifyAccountsRepository(context,
-                                new SelectRepositoryBase<StudentifyAccount>(context),
-                                new UpdateRepositoryBase<StudentifyAccount>(context),
-                                new InsertRepositoryBase<StudentifyAccount>(context));
+            _context = new StudentifyDbContext(_dbContextOptions);
+            _repository = new StudentifyAccountsRepository(_context,
+                                new SelectRepositoryBase<StudentifyAccount>(_context),
+                                new UpdateRepositoryBase<StudentifyAccount>(_context),
+                                new InsertRepositoryBase<StudentifyAccount>(_context));
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
         }
 
         [Test]
@@ -38,8 +46,9 @@ namespace Studentify.Test
             {
                 UserName = "test-user",
             };
-
-            await _repository.InsertFromStudentifyUser(user);
+            
+            var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _repository.Insert.One(account);
 
             var accounts = (await _repository.Select.All())
                 .Where(acc => acc.StudentifyUserId == user.Id).ToList();
@@ -49,13 +58,14 @@ namespace Studentify.Test
 
         [Test]
         public async Task TestSelectByUsername()
-        {
+        {       
             StudentifyUser user = new StudentifyUser()
             {
                 UserName = "test-user",
             };
 
-            await _repository.InsertFromStudentifyUser(user);
+            var addedAccount = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _repository.Insert.One(addedAccount);
 
             var account = await _repository.SelectByUsername("test-user");
 
@@ -76,7 +86,9 @@ namespace Studentify.Test
                 Owner = null,
                 Rate = 50
             };
-            await _repository.InsertFromStudentifyUser(user);
+
+            var addedAccount = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
+            await _repository.Insert.One(addedAccount);
 
             var account = await _repository.SelectByUsername("skilled-user");
             await _repository.SaveSkill(account.Id, skill);
