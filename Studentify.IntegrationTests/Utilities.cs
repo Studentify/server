@@ -81,6 +81,19 @@ namespace Studentify.IntegrationTests
             return await client.SendAsync(request);
         }
 
+        public static async Task<HttpResponseMessage> SendNoBodyRequest(
+            HttpClient client,
+            HttpMethod method,
+            string uri)
+        {
+            using var request = new HttpRequestMessage
+            {
+                Method = method,
+                RequestUri = new Uri(uri, UriKind.Relative)
+            };
+            return await client.SendAsync(request);
+        }
+
         public static async Task<T> Deserialize<T>(HttpResponseMessage response)
         {
             var body = await response.Content.ReadAsStringAsync();
