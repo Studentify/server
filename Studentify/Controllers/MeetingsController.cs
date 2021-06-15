@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
+using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
@@ -140,6 +141,7 @@ namespace Studentify.Controllers
                 AuthorId = account.Id,
                 CreationDate = DateTime.Now,
                 MaxNumberOfParticipants = meetingDto.MaxNumberOfParticipants,
+                Participants = new List<StudentifyAccount>()
             };
 
             meeting.CreationDate = DateTime.Now;

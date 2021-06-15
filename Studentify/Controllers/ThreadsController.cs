@@ -15,6 +15,7 @@ using Studentify.Models.StudentifyEvents;
 namespace Studentify.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class ThreadsController : ControllerBase
     {

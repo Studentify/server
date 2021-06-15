@@ -32,6 +32,13 @@ namespace Studentify.Data.Repositories.ControllerRepositories.Implementations
                 {
                     await Context.Entry(user).Reference(i => i.User).LoadAsync();
                 }
+                
+                var studentifyEvents = await Context.Set<StudentifyEvent>().ToListAsync();
+                foreach (var studentifyEvent in studentifyEvents)
+                {
+                    await Context.Entry(studentifyEvent).Reference(i => i.Address).LoadAsync();
+                }
+                
                 await Context.Entry(entities).Reference(t => t.ReferencedEvent).LoadAsync();
                 await Context.Entry(entities).Collection(t => t.Messages).LoadAsync();
             };
