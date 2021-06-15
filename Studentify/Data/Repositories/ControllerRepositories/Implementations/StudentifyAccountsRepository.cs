@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Studentify.Models;
 using Studentify.Models.Authentication;
+using Studentify.Models.DTO;
 
 namespace Studentify.Data.Repositories
 {
@@ -21,6 +23,7 @@ namespace Studentify.Data.Repositories
             Select.FillWithReferences += async entities =>
             {
                 await Context.Entry(entities).Reference(i => i.User).LoadAsync();
+                await Context.Entry(entities).Collection(i => i.Skills).LoadAsync();
             };
             Insert = insertRepository;
         }
@@ -31,10 +34,17 @@ namespace Studentify.Data.Repositories
             return accounts.FirstOrDefault(a => a.User.UserName == username);
         }
 
-        // public async Task InsertFromStudentifyUser(StudentifyUser user)
-        // {
-        //     // var account = new StudentifyAccount{StudentifyUserId = user.Id, User = user};
-        //     await Insert.One(account);
-        // }
+        public async Task<IEnumerable<Skill>> GetSkills(int accountId)
+        {
+            var account = await Select.ById(accountId);
+            return account.Skills;
+        }
+
+        public async Task SaveSkill(int accountId, Skill skill)
+        {
+            var account = await Select.ById(accountId);
+            account.Skills.Add(skill);
+            await Context.SaveChangesAsync();
+        }
     }
 }

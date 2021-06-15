@@ -14,6 +14,7 @@ namespace Studentify.Test
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
         private ThreadsRepository _repository;
+        private StudentifyDbContext _context;
 
         [OneTimeSetUp]
         public void Setup()
@@ -22,11 +23,17 @@ namespace Studentify.Test
                 .UseInMemoryDatabase(databaseName: "StudentifyDb")
                 .Options;
 
-            StudentifyDbContext context = new StudentifyDbContext(_dbContextOptions);
-            _repository = new ThreadsRepository(context,
-                                                new SelectRepositoryBase<Thread>(context),
-                                                new InsertRepositoryBase<Thread>(context),
-                                                new UpdateRepositoryBase<Thread>(context));
+            _context = new StudentifyDbContext(_dbContextOptions);
+            _repository = new ThreadsRepository(_context,
+                                                new SelectRepositoryBase<Thread>(_context),
+                                                new InsertRepositoryBase<Thread>(_context),
+                                                new UpdateRepositoryBase<Thread>(_context));
+        }
+        
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
         }
 
         [Test]
@@ -55,6 +62,39 @@ namespace Studentify.Test
             var selectedThread = await _repository.Select.ById(insertedThread.Id);
 
             Assert.AreEqual(insertedThread, selectedThread);
+        }
+
+        [Test]
+        public async Task TestSelectAllThreads()
+        {
+            Thread insertedThread = new Thread()
+            {
+                ReferencedEventId = 1,
+            };
+
+            await _repository.Insert.One(insertedThread);
+            var threads = await _repository.Select.All();
+
+            Assert.True(threads.Any());
+        }
+
+        [Test]
+        public async Task TestUpdateOneThread()
+        {
+            const int newEventId = 2;
+
+            Thread insertedThread = new Thread()
+            {
+                ReferencedEventId = 1,
+            };
+
+            await _repository.Insert.One(insertedThread);
+
+            insertedThread.ReferencedEventId = newEventId;
+            await _repository.Update.One(insertedThread, insertedThread.Id);
+            var selectedThread = await _repository.Select.ById(insertedThread.Id);
+
+            Assert.AreEqual(newEventId, selectedThread.ReferencedEventId);
         }
     }
 }
