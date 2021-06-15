@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Interfaces;
+using Studentify.Models;
 using Studentify.Models.HttpBody;
 using Studentify.Models.StudentifyEvents;
 
@@ -60,11 +61,11 @@ namespace Studentify.Controllers
 
                 if (meeting == null)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"There is no meeting for id = {id}");  //todo change to other code
+                    return StatusCode(StatusCodes.Status404NotFound, $"There is no meeting for id = {id}");
                 }
                 if (meeting.Participants.Count == meeting.MaxNumberOfParticipants)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"Maximum number of participants has been reached");      //todo change to other code
+                    return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Maximum number of participants has been reached");
                 }
 
                 var username = User.Identity.Name;
@@ -72,7 +73,7 @@ namespace Studentify.Controllers
 
                 if (meeting.Participants.Contains(account))
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"User already participates");    //todo change to other code
+                    return StatusCode(StatusCodes.Status405MethodNotAllowed, $"User already participates");
                 }
 
                 await _meetingsRepository.RegisterAttendance(meeting, account);
@@ -140,6 +141,7 @@ namespace Studentify.Controllers
                 AuthorId = account.Id,
                 CreationDate = DateTime.Now,
                 MaxNumberOfParticipants = meetingDto.MaxNumberOfParticipants,
+                Participants = new List<StudentifyAccount>()
             };
 
             meeting.CreationDate = DateTime.Now;

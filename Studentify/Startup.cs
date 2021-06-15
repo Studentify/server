@@ -45,6 +45,7 @@ namespace Studentify
                 .AddScoped(typeof(IUpdateRepository<>), typeof(UpdateRepositoryBase<>))
 
                 .AddScoped<IStudentifyAccountsRepository, StudentifyAccountsRepository>()
+                .AddScoped<ISkillsRepository, SkillsRepository>()
 
                 .AddScoped<IThreadsRepository, ThreadsRepository>()
                 .AddScoped<IMessagesRepository, MessagesRepository>()
@@ -65,7 +66,7 @@ namespace Studentify
                     });
             });
             
-            services.AddIdentity<StudentifyUser, IdentityRole>()
+            services.AddIdentity<StudentifyUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<StudentifyDbContext>()
                 .AddDefaultTokenProviders();
 

@@ -27,7 +27,7 @@ namespace Studentify.Models.StudentifyEvents
         [JsonIgnore] public Point MapPoint { get; set; }
         [JsonIgnore] public Address Address { get; set; }
 
-        [JsonIgnore] public StudentifyAccount Author { get; set; }
+        public StudentifyAccount Author { get; set; }
         [Required] public int AuthorId { get; set; }
     }
 }
