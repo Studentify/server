@@ -127,7 +127,7 @@ namespace Studentify.IntegrationTests
         }
 
         [Test]
-        [Order(2)]
+        [Order(3)]
         public async Task TestPatchSkill()
         {
             _testSkill.Name = "Już umieją symulować";
