@@ -53,7 +53,17 @@ namespace Studentify.Test
 
             Assert.True(tradeOffers.Contains(tradeOffer));
         }
-
+        [Test]
+        public async Task TestRaiseWhenWrongSelect()
+        {
+            try
+            {
+                await _repository.Select.ById(-2);
+                Assert.Fail("Expected exception, but didnt get any");
+            }
+            catch (System.Data.DataException)
+            {}
+        }
         [Test]
         public async Task TestGetOneOffer()
         {
