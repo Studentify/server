@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Studentify.Models;
 using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Data.Repositories
@@ -15,6 +17,11 @@ namespace Studentify.Data.Repositories
         protected virtual async Task FillWithReferences(T entities)
         {
             await Context.Entry(entities).Reference(i => i.Author).LoadAsync();
+            var users = await Context.Set<StudentifyAccount>().ToListAsync();
+            foreach (var user in users)
+            {
+                await Context.Entry(user).Reference(i => i.User).LoadAsync();
+            }
             await Context.Entry(entities).Reference(i => i.Address).LoadAsync();
         }
     }
