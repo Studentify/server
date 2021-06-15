@@ -17,6 +17,7 @@ namespace Studentify.Test
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
         private MessagesRepository _repository;
         private Thread _thread;
+        private StudentifyDbContext _context;
 
         [OneTimeSetUp]
         public void Setup()
@@ -25,16 +26,22 @@ namespace Studentify.Test
                 .UseInMemoryDatabase(databaseName: "StudentifyDb")
                 .Options;
 
-            StudentifyDbContext context = new StudentifyDbContext(_dbContextOptions);
-            _repository = new MessagesRepository(context,
-                                                new SelectRepositoryBase<Message>(context),
-                                                new InsertRepositoryBase<Message>(context),
-                                                new UpdateRepositoryBase<Message>(context));
+            _context = new StudentifyDbContext(_dbContextOptions);
+            _repository = new MessagesRepository(_context,
+                                                new SelectRepositoryBase<Message>(_context),
+                                                new InsertRepositoryBase<Message>(_context),
+                                                new UpdateRepositoryBase<Message>(_context));
 
             //Creating one dummy context for all messages
             _thread = new Thread { ReferencedEventId = 1 };
-            context.Threads.Add(_thread);
-            context.SaveChanges();
+            _context.Threads.Add(_thread);
+            _context.SaveChanges();
+        }
+        
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _context.Dispose();
         }
 
         [Test]
