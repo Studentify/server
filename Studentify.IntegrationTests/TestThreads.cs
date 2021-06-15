@@ -109,8 +109,9 @@ namespace Studentify.IntegrationTests
         [Order(2)]
         public async Task TestGetThreads()
         {
-            var response = await Utilities.SendNoBodyRequest(
+            var response = await Utilities.SendAuthorisedNoBodyRequest(
                 _clientRecipent,
+                _loginDataRecipient,
                 HttpMethod.Get,
                 "/api/Threads");
             response.EnsureSuccessStatusCode();
@@ -121,10 +122,23 @@ namespace Studentify.IntegrationTests
 
         [Test]
         [Order(2)]
-        public async Task TestGetThreadById()
+        public async Task FailToGetThreadsWhileNotLogged()
         {
             var response = await Utilities.SendNoBodyRequest(
                 _clientRecipent,
+                HttpMethod.Get,
+                "/api/Threads");
+            if (response.IsSuccessStatusCode) Assert.Fail();
+            Assert.Pass();
+        }
+
+        [Test]
+        [Order(2)]
+        public async Task TestGetThreadById()
+        {
+            var response = await Utilities.SendAuthorisedNoBodyRequest(
+                _clientRecipent,
+                _loginDataRecipient,
                 HttpMethod.Get,
                 "/api/Threads/" + _testThreadGetDto.Id);
             response.EnsureSuccessStatusCode();

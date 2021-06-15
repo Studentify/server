@@ -125,23 +125,5 @@ namespace Studentify.IntegrationTests
             var skill = await Utilities.Deserialize<SkillGetDto>(response);
             Assert.True(skill == _testSkillGetDto);
         }
-
-        [Test]
-        [Order(3)]
-        public async Task TestPatchSkill()
-        {
-            _testSkill.Name = "Już umieją symulować";
-            _testSkill.Rate += 2;
-            var response = await Utilities.SendAuthorizedRequest(
-               _clientCritic,
-               _loginDataCritic,
-               HttpMethod.Patch,
-               "/api/Skills/" + _testSkillGetDto.Id,
-               _testSkill);
-            response.EnsureSuccessStatusCode();
-            var patchedSkill = await Utilities.Deserialize<SkillGetDto>(response);
-            Assert.True(patchedSkill == _testSkillGetDto);
-            _testSkillGetDto = patchedSkill;
-        }
     }
 }
