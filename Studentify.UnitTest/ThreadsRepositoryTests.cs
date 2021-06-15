@@ -3,6 +3,8 @@ using NUnit.Framework;
 using Studentify.Data;
 using Studentify.Data.Repositories;
 using Studentify.Data.Repositories.ControllerRepositories.Implementations;
+using Studentify.Models;
+using Studentify.Models.Authentication;
 using Studentify.Models.Messages;
 using System.Linq;
 using System.Threading.Tasks;
@@ -95,6 +97,29 @@ namespace Studentify.Test
             var selectedThread = await _repository.Select.ById(insertedThread.Id);
 
             Assert.AreEqual(newEventId, selectedThread.ReferencedEventId);
+        }
+
+        [Test]
+        public async Task TestGetThreadsForSpecifiedUser()
+        {
+            StudentifyUser user = new StudentifyUser
+            {
+                UserName = "test-user-threader"
+            };
+            StudentifyAccount account = new StudentifyAccount
+            {
+                User = user
+            };
+            Thread insertedThread = new Thread()
+            {
+                ReferencedEventId = 1,
+                UserAccount = account
+            };
+
+            await _repository.Insert.One(insertedThread);
+            var threads = await _repository.SelectAllUserRelatedThreads(account.UserName);
+
+            Assert.True(threads.Any());
         }
     }
 }

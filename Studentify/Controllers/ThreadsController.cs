@@ -33,9 +33,19 @@ namespace Studentify.Controllers
 
         // GET: api/Threads
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Thread>>> GetThreads()
         {
-            var threads = await _threadsRepository.Select.All();
+            var username = User.Identity.Name;
+            var threads = await _threadsRepository.SelectAllUserRelatedThreads(username);
+
+            foreach(var thread in threads)
+            {
+                var messages = await _messagesRepository.SelectAllFromThread(thread.Id);
+                messages.ToList().Sort((m1, m2) => m1.Date.CompareTo(m2.Date));
+                thread.LastMessage = messages.LastOrDefault();
+            }
+
             return threads.ToList();
         }
 
@@ -79,6 +89,17 @@ namespace Studentify.Controllers
             {
                 return NotFound($"Event of id {eventId} not found.");
             }
+
+            var threads = await _threadsRepository.Select.All();
+            threads = threads.Where(t => ((t.ReferencedEvent.Id.Equals(eventId)) && t.UserAccount.Id.Equals(account.Id)));
+
+            var existingThread = threads.FirstOrDefault();
+
+            if (existingThread != null)
+            {
+                return existingThread;
+            }
+
 
             var thread = new Thread()
             {
