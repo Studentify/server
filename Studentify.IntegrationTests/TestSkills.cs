@@ -1,14 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Mime;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
 using System.Linq;
 using NUnit.Framework;
 using Studentify.Models.HttpBody;
-using Studentify.Models;
 using Studentify.IntegrationTests.GetDto;
 using Studentify.Models.DTO;
 
@@ -40,7 +35,6 @@ namespace Studentify.IntegrationTests
             LastName = "Testowsky",
             Password = "Test123!"
         };
-        private int _testUserCriticId;
 
         private SkillDto _testSkill;
         private SkillGetDto _testSkillGetDto;
@@ -68,7 +62,6 @@ namespace Studentify.IntegrationTests
             response.EnsureSuccessStatusCode();
             var accounts = await Utilities.Deserialize<List<StudentifyAccountGetDto>>(response);
             _testUserSkilledId = (from a in accounts where a == _testUserSkilled select a.Id).FirstOrDefault();
-            _testUserCriticId = (from a in accounts where a == _testUserSkilled select a.Id).FirstOrDefault();
 
             _testSkill = new()
             {
