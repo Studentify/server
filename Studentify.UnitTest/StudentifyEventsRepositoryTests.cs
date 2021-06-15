@@ -9,6 +9,7 @@ using Studentify.Models.StudentifyEvents;
 
 namespace Studentify.Test
 {
+    [TestFixture]
     public class StudentifyEventsRepositoryTests
     {
         private DbContextOptions<StudentifyDbContext> _dbContextOptions;
@@ -62,22 +63,19 @@ namespace Studentify.Test
         public async Task TestGetAllStudentifyEvents()
         {
             var studentifyEvents = await _repository.Select.All();
-            Assert.True(studentifyEvents.ToList().Count == 0);
+            var count = studentifyEvents.ToList().Count;
             
             TradeOffer studentifyEvent = new TradeOffer()
             {
-                AuthorId = 1,
-                Address = null,
                 Name = "Testowy studentifyEvent get all",
                 CreationDate = DateTime.Now,
                 ExpiryDate = DateTime.Now,
-                BuyerId = 2
             };
 
             await _helperRepository.Insert.One(studentifyEvent);
             studentifyEvents = await _repository.Select.All();
 
-            Assert.True(studentifyEvents.ToList().Count > 0);
+            Assert.True(studentifyEvents.ToList().Count > count);
         }
         
 
@@ -95,19 +93,19 @@ namespace Studentify.Test
         {
             TradeOffer studentifyEvent = new TradeOffer()
             {
-                AuthorId = 1,
-                Address = null,
                 Name = "Testowy studentifyEvent get all",
                 CreationDate = DateTime.Now,
                 ExpiryDate = DateTime.Now,
-                BuyerId = 2
             };
+            
             await _helperRepository.Insert.One(studentifyEvent);
             var studentifyEvents = await _repository.Select.All();
             Assert.True(studentifyEvents.ToList().Count > 0);
+            
+            var count = studentifyEvents.ToList().Count;
             await _repository.Delete.ById(studentifyEvent.Id);
             studentifyEvents = await _repository.Select.All();
-            Assert.True(studentifyEvents.ToList().Count == 0);
+            Assert.True(studentifyEvents.ToList().Count == count - 1);
         }
     }
 }
