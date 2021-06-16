@@ -79,6 +79,18 @@ namespace Studentify.Test
         }
 
         [Test]
+        public async Task TestRaiseWhenWrongSelect()
+        {
+            try
+            {
+                await _repository.Select.ById(-2);
+                Assert.Fail("Expected exception, but didnt get any");
+            }
+            catch (System.Data.DataException)
+            {}
+        }
+
+        [Test]
         public async Task TestGetAllInfos()
         {
             Info info = new Info()
@@ -96,6 +108,7 @@ namespace Studentify.Test
 
             Assert.True(infos.ToList().Count > 0);
         }
+
 
         [Test]
         public async Task TestUpdateOneInfo()
